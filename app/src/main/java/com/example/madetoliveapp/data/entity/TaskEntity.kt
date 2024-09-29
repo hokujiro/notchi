@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class TaskEntity(
     @PrimaryKey val uid: Int,
-    @ColumnInfo(name = "check") val check: Boolean,
+    @ColumnInfo(name = "checked") val checked: Boolean,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "subTasks") val subTasks: List<SubTaskEntity>?,
     @ColumnInfo(name = "category") val category: String?,

@@ -2,11 +2,19 @@ package com.example.madetoliveapp.presentation.daily
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import com.example.madetoliveapp.R
+import com.example.madetoliveapp.presentation.daily.screens.TaskListScreen
+import com.example.madetoliveapp.presentation.style.AppTheme
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContent {
+            AppTheme {
+                TaskListScreen()
+            }
+        }
     }
 }
