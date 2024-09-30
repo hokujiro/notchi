@@ -1,20 +1,29 @@
 package com.example.madetoliveapp.presentation.daily.screens
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.presentation.TaskViewModel
+import org.koin.androidx.compose.koinViewModel
 import okhttp3.internal.concurrent.Task
+import androidx.compose.material.Icon
+import androidx.compose.runtime.*
+
 
 @Composable
-fun TaskListScreen(taskViewModel: TaskViewModel = viewModel()) {
+fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     // Obtener las tareas desde el ViewModel
-    val taskList by taskViewModel.tasks.collectAsState()
+    val tasks = remember { mutableStateOf(emptyList<TaskEntity>()) }
 
+    LaunchedEffect(Unit) {
+        tasks.value = taskViewModel.getAllTasks()
+    }
     // Mostrar la lista de tareas
     Scaffold(
         topBar = {
@@ -44,12 +53,12 @@ fun TaskList(tasks: List<TaskEntity>, onTaskClick: (Int) -> Unit, modifier: Modi
 }
 
 @Composable
-fun TaskItem(task: Task, onTaskClick: (Int) -> Unit) {
+fun TaskItem(task: TaskEntity, onTaskClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onTaskClick(task.id) },
+            .clickable { onTaskClick(task.uid) },
         elevation = 4.dp
     ) {
         Row(
@@ -59,14 +68,14 @@ fun TaskItem(task: Task, onTaskClick: (Int) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = task.isCompleted,
-                onCheckedChange = { onTaskClick(task.id) }
+                checked = task.checked,
+                onCheckedChange = { onTaskClick(task.uid) }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.body1,
-                textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+                textDecoration = if (task.checked) TextDecoration.LineThrough else null
             )
         }
     }

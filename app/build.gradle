@@ -70,6 +70,11 @@ dependencies {
     //App Write.io
     implementation("io.appwrite:sdk-for-android:5.1.1")
 
+    //Koin
+    implementation("io.insert-koin:koin-android:3.5.0")
+    implementation "io.insert-koin:koin-androidx-compose:3.4.5"
+
+
     // Testing
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.2"
     debugImplementation "androidx.compose.ui:ui-tooling:1.7.2"

@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.presentation.style
+package com.example.madetoliveapp.presentation.theme
 
 import androidx.compose.material.Typography
 
