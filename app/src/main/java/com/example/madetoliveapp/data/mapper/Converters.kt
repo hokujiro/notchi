@@ -5,7 +5,7 @@ import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class TypeConverters {
+class Converters {
     private val gson = Gson()
 
     // Convertir List<SubTaskEntity> a String
