@@ -3,6 +3,7 @@ package com.example.madetoliveapp.presentation.daily.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +14,8 @@ import com.example.madetoliveapp.presentation.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 import okhttp3.internal.concurrent.Task
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 
 
@@ -22,7 +25,8 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     val tasks = remember { mutableStateOf(emptyList<TaskEntity>()) }
 
     LaunchedEffect(Unit) {
-        tasks.value = taskViewModel.getAllTasks()
+       taskViewModel.getAllTasks()
+        tasks.value = taskViewModel.tasks.value
     }
     // Mostrar la lista de tareas
     Scaffold(
@@ -32,14 +36,22 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 // Agregar una nueva tarea de ejemplo
-                val newTask = TaskEntity(uid = taskList.size + 1, title = "Nueva tarea", checked = false)
+                val newTask = TaskEntity(
+                    uid = tasks.value.size + 1,
+                    title = "Nueva tarea",
+                    checked = false,
+                    subTasks = listOf(),
+                    category = null,
+                    finishingDate = null,
+                    points = null
+                )
                 taskViewModel.addTask(newTask)
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar tarea")
             }
         }
     ) { paddingValues ->
-        TaskList(taskList, taskViewModel::toggleTaskCompletion, Modifier.padding(paddingValues))
+        TaskList(tasks.value, taskViewModel::toggleTaskCompletion, Modifier.padding(paddingValues))
     }
 }
 

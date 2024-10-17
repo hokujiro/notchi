@@ -32,8 +32,8 @@ class TaskViewModel(
 
     fun getAllTasks() {
         viewModelScope.launch {
-            val tasks = getAllTasksUseCase.execute()
-            // Do something with the tasks, like updating the UI
+            val result = getAllTasksUseCase.execute()
+            _tasks.value = result
         }
     }
 

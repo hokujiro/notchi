@@ -59,6 +59,8 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:1.7.3"
     implementation "androidx.compose.runtime:runtime-livedata:1.7.3"
     implementation "androidx.lifecycle:lifecycle-livedata-core:2.8.0"
+    implementation 'androidx.compose.material:material-icons-core:1.7.3'
+    implementation 'androidx.compose.material:material-icons-extended:1.7.3'
 
     //Gson
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -70,6 +72,7 @@ dependencies {
     //Room
     implementation "androidx.room:room-runtime:2.6.1"
     ksp "androidx.room:room-compiler:2.6.1"
+    implementation "androidx.room:room-ktx:2.5.0"
 
     //App Write.io
     implementation("io.appwrite:sdk-for-android:5.1.1")
