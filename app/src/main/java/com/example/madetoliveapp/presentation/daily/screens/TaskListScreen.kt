@@ -22,11 +22,10 @@ import androidx.compose.runtime.*
 @Composable
 fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     // Obtener las tareas desde el ViewModel
-    val tasks = remember { mutableStateOf(emptyList<TaskEntity>()) }
+    val tasks by taskViewModel.tasks.collectAsState()
 
     LaunchedEffect(Unit) {
        taskViewModel.getAllTasks()
-        tasks.value = taskViewModel.tasks.value
     }
     // Mostrar la lista de tareas
     Scaffold(
@@ -35,9 +34,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Agregar una nueva tarea de ejemplo
                 val newTask = TaskEntity(
-                    uid = tasks.value.size + 1,
                     title = "Nueva tarea",
                     checked = false,
                     subTasks = listOf(),
@@ -51,7 +48,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
             }
         }
     ) { paddingValues ->
-        TaskList(tasks.value, taskViewModel::toggleTaskCompletion, Modifier.padding(paddingValues))
+        TaskList(tasks, taskViewModel::toggleTaskCompletion, Modifier.padding(paddingValues))
     }
 }
 
