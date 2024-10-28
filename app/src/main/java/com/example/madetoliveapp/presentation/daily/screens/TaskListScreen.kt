@@ -17,6 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import java.util.Date
 
 
 @Composable
@@ -39,7 +40,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                     checked = false,
                     subTasks = listOf(),
                     category = null,
-                    finishingDate = null,
+                    finishingDate = "2024-10-28",
                     points = null
                 )
                 taskViewModel.addTask(newTask)
