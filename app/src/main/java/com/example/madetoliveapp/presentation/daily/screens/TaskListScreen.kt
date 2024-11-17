@@ -12,11 +12,12 @@ import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.presentation.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
-import okhttp3.internal.concurrent.Task
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import com.example.madetoliveapp.domain.model.TaskModel
+import java.text.SimpleDateFormat
 import java.util.Date
 
 
@@ -24,6 +25,7 @@ import java.util.Date
 fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     // Obtener las tareas desde el ViewModel
     val tasks by taskViewModel.tasks.collectAsState()
+    val dateFormat = SimpleDateFormat("d-MM-yyyy")
 
     LaunchedEffect(Unit) {
        taskViewModel.getAllTasks()
@@ -34,13 +36,14 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
             TopAppBar(title = { Text("Lista de Tareas") })
         },
         floatingActionButton = {
+            val parsedDate: Date = dateFormat.parse("2-10-2013") as Date
             FloatingActionButton(onClick = {
-                val newTask = TaskEntity(
+                val newTask = TaskModel(
                     title = "Nueva tarea",
                     checked = false,
                     subTasks = listOf(),
                     category = null,
-                    finishingDate = "2024-10-28",
+                    finishingDate = parsedDate,
                     points = null
                 )
                 taskViewModel.addTask(newTask)
@@ -54,7 +57,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
 }
 
 @Composable
-fun TaskList(tasks: List<TaskEntity>, onTaskClick: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(tasks: List<TaskModel>, onTaskClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier) {
         items(tasks) { task ->
             TaskItem(task, onTaskClick)
@@ -63,7 +66,7 @@ fun TaskList(tasks: List<TaskEntity>, onTaskClick: (Int) -> Unit, modifier: Modi
 }
 
 @Composable
-fun TaskItem(task: TaskEntity, onTaskClick: (Int) -> Unit) {
+fun TaskItem(task: TaskModel, onTaskClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

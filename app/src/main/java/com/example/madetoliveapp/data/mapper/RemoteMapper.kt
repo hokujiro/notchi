@@ -8,11 +8,20 @@ import com.example.madetoliveapp.domain.model.TaskModel
 interface RemoteMapper {
 
     fun toModel(
-        taskEntity: TaskEntity
+        entity: TaskEntity
     ): TaskModel
+
+    fun toEntity(
+        model: TaskModel
+    ): TaskEntity
+
 
     fun toSubTasksModel(
         subTaskEntity: List<SubTaskEntity>
     ): List<SubTaskModel>
+
+    fun toSubTasksEntity(
+        subTaskModel: List<SubTaskModel>
+    ): List<SubTaskEntity>
 
 }

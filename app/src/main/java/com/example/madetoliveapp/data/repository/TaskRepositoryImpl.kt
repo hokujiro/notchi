@@ -14,23 +14,13 @@ class TaskRepositoryImpl(
     override suspend fun getAllTasks(): List<TaskModel> {
         return taskDao.getAll().map { mapper.toModel(it) }
     }
-    /*
-        // Fetch tasks by a list of task IDs
-        override suspend fun getTasksByIds(taskIds: IntArray): List<TaskEntity> {
-            return taskDao.loadAllByIds(taskIds)
-        }
 
-        // Find a task by first and last name (title)
-        override suspend fun findTaskByTitle(firstName: String, lastName: String): TaskEntity {
-            return taskDao.findByTitle(firstName, lastName)
-        }*/
-
-    override suspend fun insertTasks(vararg tasks: TaskEntity) {
-        taskDao.insertAll(*tasks)
+    override suspend fun insertTask(task: TaskModel) {
+        taskDao.insert(mapper.toEntity(task))
     }
 
     // Delete a task from the database
-    override suspend fun deleteTask(task: TaskEntity) {
-        taskDao.delete(task)
+    override suspend fun deleteTask(task: TaskModel) {
+        taskDao.delete(mapper.toEntity(task))
     }
 }

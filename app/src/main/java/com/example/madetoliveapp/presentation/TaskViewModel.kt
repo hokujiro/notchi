@@ -3,7 +3,7 @@ package com.example.madetoliveapp.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.madetoliveapp.data.entity.TaskEntity
-import com.example.madetoliveapp.data.repository.TaskRepository
+import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.usecase.AddTaskUseCase
 import com.example.madetoliveapp.domain.usecase.DeleteTaskUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
@@ -19,8 +19,8 @@ class TaskViewModel(
 )  : ViewModel() {
 
     // Lista de tareas como StateFlow (mejor integración con Compose)
-    private val _tasks = MutableStateFlow<List<TaskEntity>>(emptyList())
-    val tasks: StateFlow<List<TaskEntity>> = _tasks.asStateFlow()
+    private val _tasks = MutableStateFlow<List<TaskModel>>(emptyList())
+    val tasks: StateFlow<List<TaskModel>> = _tasks.asStateFlow()
 
     // Método para marcar una tarea como completada
     fun toggleTaskCompletion(taskId: Int) {
@@ -38,15 +38,15 @@ class TaskViewModel(
     }
 
     // Add tasks using the use case
-    fun addTask(task: TaskEntity) {
+    fun addTask(task: TaskModel) {
         viewModelScope.launch {
             addTaskUseCase.execute(task)
         }
-        _tasks.value = _tasks.value + task
+        _tasks.value += task
     }
 
     // Delete tasks using the use case
-    fun deleteTask(task: TaskEntity) {
+    fun deleteTask(task: TaskModel) {
         viewModelScope.launch {
             deleteTaskUseCase.execute(task)
         }

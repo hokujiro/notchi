@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import java.util.Date
 
-class TaskModel (
+data class TaskModel (
     val uid: Int = 0,
     val checked: Boolean,
     val title: String = "Title",

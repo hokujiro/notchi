@@ -14,7 +14,7 @@ interface TaskDao {
     suspend fun getAll(): List<TaskEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg tasks: TaskEntity)
+    suspend fun insert(task: TaskEntity)
 
     @Delete
     suspend fun delete(task: TaskEntity)

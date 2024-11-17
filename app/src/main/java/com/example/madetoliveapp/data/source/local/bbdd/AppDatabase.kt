@@ -8,7 +8,7 @@ import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.mapper.Converters
 import com.example.madetoliveapp.data.source.local.dao.TaskDao
 
-@Database(entities = [TaskEntity::class, SubTaskEntity::class], version = 2, exportSchema = false)
+@Database(entities = [TaskEntity::class, SubTaskEntity::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
