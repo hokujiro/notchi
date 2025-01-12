@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -67,25 +68,24 @@ fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
             }
         }
     ) { paddingValues ->
+        val outerScrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(outerScrollState)
         ) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "Rewards Screen", style = MaterialTheme.typography.h4)
             }
             CalendarApp(modifier = Modifier.fillMaxWidth())
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+
             TaskComponent(
                 tasks = tasks,
                 onTaskClick = taskViewModel::toggleTaskCompletion,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
             )
         }
     }
