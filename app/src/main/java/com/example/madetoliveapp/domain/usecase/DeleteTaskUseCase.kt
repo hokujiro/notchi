@@ -6,6 +6,6 @@ import com.example.madetoliveapp.domain.model.TaskModel
 
 class DeleteTaskUseCase(private val taskRepository: TaskRepository) {
     suspend fun execute(task: TaskModel) {
-//        taskRepository.deleteTask(task)
+        taskRepository.deleteTask(task)
     }
 }

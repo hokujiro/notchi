@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import com.example.madetoliveapp.domain.model.TaskModel
+import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -32,33 +33,41 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     }
     // Mostrar la lista de tareas
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Lista de Tareas") })
-        },
+        bottomBar = { BottomNavigationBar(selectedRoute = "tasks") },
         floatingActionButton = {
-            val parsedDate: Date = dateFormat.parse("2-10-2013") as Date
-            FloatingActionButton(onClick = {
-                val newTask = TaskModel(
-                    title = "Nueva tarea",
-                    checked = false,
-                    subTasks = listOf(),
-                    category = null,
-                    finishingDate = parsedDate,
-                    points = null
-                )
-                taskViewModel.addTask(newTask)
-            }) {
+            FloatingActionButton(
+                onClick = {
+                    val parsedDate: Date = dateFormat.parse("2-10-2013") as Date
+                    val newTask = TaskModel(
+                        title = "Nueva tarea",
+                        checked = false,
+                        subTasks = listOf(),
+                        category = null,
+                        finishingDate = parsedDate,
+                        points = null
+                    )
+                    taskViewModel.addTask(newTask)
+                },
+                modifier = Modifier.padding(16.dp) // Adjust padding to prevent overlap
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar tarea")
             }
         }
     ) { paddingValues ->
-        TaskList(tasks, taskViewModel::toggleTaskCompletion, Modifier.padding(paddingValues))
+        TaskList(
+            tasks = tasks,
+            onTaskClick = taskViewModel::toggleTaskCompletion,
+            modifier = Modifier.padding(paddingValues) // Apply padding from Scaffold
+        )
     }
 }
 
 @Composable
 fun TaskList(tasks: List<TaskModel>, onTaskClick: (Int) -> Unit, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier.padding(bottom = 56.dp)
+            .padding(WindowInsets.systemBars.asPaddingValues()) // Account for system bars
+    ) {
         items(tasks) { task ->
             TaskItem(task, onTaskClick)
         }

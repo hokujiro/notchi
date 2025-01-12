@@ -10,17 +10,17 @@ import androidx.compose.ui.graphics.Color
 
 // Definir los colores claros y oscuros
 private val DarkColorPalette = darkColors(
-    primary = Color(0x522258),
-    primaryVariant = Color(0x8C3061),
-    secondary = Color(0xC63C51),
-    secondaryVariant = Color(0xD95F59)
+    primary = Color(0xFF522258),
+    primaryVariant = Color(0xFF8C3061),
+    secondary = Color(0xFFC63C51),
+    secondaryVariant = Color(0xFFD95F59)
 )
 
 private val LightColorPalette = lightColors(
-    primary = Color(0xFFC5C5),
-    primaryVariant = Color(0xFFEBD8),
-    secondary = Color(0xC7DCA7),
-    secondaryVariant = Color(0x89B9AD)
+    primary = Color(0xFF522258),
+    primaryVariant = Color(0xFF8C3061),
+    secondary = Color(0xFFC63C51),
+    secondaryVariant = Color(0xFFD95F59)
 )
 
 @Composable
@@ -36,8 +36,8 @@ fun AppTheme(
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
         shapes = Shapes,
+        typography = Typography,
         content = content
     )
 }

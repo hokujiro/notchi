@@ -23,6 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".presentation.home.HomeActivity" />
+        <activity android:name=".presentation.rewards.RewardsActivity" />
 
         <activity android:name="io.appwrite.views.CallbackActivity" android:exported="true">
             <intent-filter android:label="android_web_auth">
