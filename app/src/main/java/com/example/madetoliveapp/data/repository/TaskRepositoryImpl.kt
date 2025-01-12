@@ -15,6 +15,11 @@ class TaskRepositoryImpl(
         return taskDao.getAll().map { mapper.toModel(it) }
     }
 
+    // Fetch all tasks from the database
+    override suspend fun getTasksForDay(date: Long): List<TaskModel> {
+        return taskDao.getTasksForDay(date).map { mapper.toModel(it) }
+    }
+
     override suspend fun insertTask(task: TaskModel) {
         taskDao.insert(mapper.toEntity(task))
     }

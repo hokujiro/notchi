@@ -20,7 +20,7 @@ class RemoteMapperImpl : RemoteMapper {
                 title = title,
                 subTasks = toSubTasksModel(subTasks ?: emptyList()),
                 category = category,
-                finishingDate = stringToDate(finishingDate)?: Date(),
+                finishingDate = Date(finishingDate),
                 points = points
 
             )
@@ -33,7 +33,7 @@ class RemoteMapperImpl : RemoteMapper {
                 title = title,
                 subTasks =  toSubTasksEntity(subTasks ?: emptyList()),
                 category = category,
-                finishingDate = dateToString(finishingDate)?: "Date",
+                finishingDate = finishingDate.time,
                 points = points
             )
         }

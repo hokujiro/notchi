@@ -11,6 +11,6 @@ data class TaskEntity(
     @ColumnInfo(name = "title") val title: String = "Title",
     @ColumnInfo(name = "subTasks") val subTasks: List<SubTaskEntity>?,
     @ColumnInfo(name = "category") val category: String?,
-    @ColumnInfo(name = "finishingDate") val finishingDate: String,
+    @ColumnInfo(name = "finishingDate") val finishingDate: Long,
     @ColumnInfo(name = "points") val points: Int?
 )

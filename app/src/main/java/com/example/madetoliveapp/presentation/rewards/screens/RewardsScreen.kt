@@ -1,14 +1,11 @@
 package com.example.madetoliveapp.presentation.rewards.screens
 
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FloatingActionButton
@@ -28,10 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.TaskViewModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
-import com.example.madetoliveapp.presentation.components.CalendarApp
+import com.example.madetoliveapp.presentation.components.CalendarHeader
 import com.example.madetoliveapp.presentation.components.TaskComponent
-import com.example.madetoliveapp.presentation.daily.screens.TaskList
-import com.example.madetoliveapp.presentation.daily.screens.TaskListScreen
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,7 +73,7 @@ fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "Rewards Screen", style = MaterialTheme.typography.h4)
             }
-            CalendarApp(modifier = Modifier.fillMaxWidth())
+            CalendarHeader(modifier = Modifier.fillMaxWidth())
 
             TaskComponent(
                 tasks = tasks,
