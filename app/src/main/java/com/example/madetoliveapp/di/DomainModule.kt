@@ -4,10 +4,12 @@ import org.koin.dsl.module
 import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
 import com.example.madetoliveapp.domain.usecase.AddTaskUseCase
 import com.example.madetoliveapp.domain.usecase.DeleteTaskUseCase
+import com.example.madetoliveapp.domain.usecase.GetTasksForDayUseCase
 
 val domainModule = module {
     // Use cases
     factory { GetTasksUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { GetTasksForDayUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { AddTaskUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { DeleteTaskUseCase(get()) } // Assuming use case depends on TaskRepository
 

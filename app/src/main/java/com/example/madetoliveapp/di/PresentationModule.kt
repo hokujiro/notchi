@@ -6,5 +6,5 @@ import org.koin.dsl.module
 
 val presentationModule = module {
     // ViewModel
-    viewModel { TaskViewModel(get(), get(), get()) } // Assuming ViewModel depends on GetTasksUseCase
+    viewModel { TaskViewModel(get(), get(), get(), get()) } // Assuming ViewModel depends on GetTasksUseCase
 }
