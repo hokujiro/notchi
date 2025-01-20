@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.madetoliveapp.data.entity.TaskEntity
 
 @Dao
@@ -21,4 +22,7 @@ interface TaskDao {
 
     @Delete
     suspend fun delete(task: TaskEntity)
+
+    @Update
+    suspend fun update(task: TaskEntity)
 }

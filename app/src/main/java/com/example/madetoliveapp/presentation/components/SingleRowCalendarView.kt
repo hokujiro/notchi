@@ -32,24 +32,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.extensions.CalendarDataSource
+import com.example.madetoliveapp.presentation.extensions.toLocalDate
 import com.example.madetoliveapp.presentation.model.CalendarUiModel
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 
-@Preview(showSystemUi = true)
+/*@Preview(showSystemUi = true)
 @Composable
 fun CalendarHeaderPreview() {
     CalendarHeader(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp),
+        onDayClick: (Int) -> Unit
     )
-}
+}*/
 
 @Composable
-fun CalendarHeader(modifier: Modifier = Modifier) {
+fun CalendarHeader(
+    modifier: Modifier = Modifier,
+    selectedDate: Long,
+    onDateSelected: (Long) -> Unit
+) {
     val dataSource = CalendarDataSource()
-    var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+    var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = selectedDate.toLocalDate())) }
     val listState = rememberLazyListState()
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
@@ -76,6 +83,7 @@ fun CalendarHeader(modifier: Modifier = Modifier) {
                     )
                 }
             )
+                onDateSelected(date.date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli())
         },
         )
     }

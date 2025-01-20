@@ -29,6 +29,7 @@ class RemoteMapperImpl : RemoteMapper {
     override fun toEntity(model: TaskModel): TaskEntity =
         with(model){
             TaskEntity(
+                uid=uid,
                 checked = checked,
                 title = title,
                 subTasks =  toSubTasksEntity(subTasks ?: emptyList()),
