@@ -5,6 +5,8 @@ import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
 import com.example.madetoliveapp.domain.usecase.AddTaskUseCase
 import com.example.madetoliveapp.domain.usecase.DeleteTaskUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksForDayUseCase
+import com.example.madetoliveapp.domain.usecase.LoginUseCase
+import com.example.madetoliveapp.domain.usecase.RegisterUseCase
 import com.example.madetoliveapp.domain.usecase.UpdateTaskUseCase
 
 val domainModule = module {
@@ -14,5 +16,7 @@ val domainModule = module {
     factory { AddTaskUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { DeleteTaskUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { UpdateTaskUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { LoginUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { RegisterUseCase(get()) } // Assuming use case depends on TaskRepository
 
 }
