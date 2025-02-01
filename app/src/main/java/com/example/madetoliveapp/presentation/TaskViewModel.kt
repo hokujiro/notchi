@@ -38,7 +38,7 @@ class TaskViewModel(
             }
         }
     }
-
+//comment to delete todo
     fun getAllTasks() {
         viewModelScope.launch {
             val result = getAllTasksUseCase.execute()
