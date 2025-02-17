@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "763133262016",
+    "project_id": "made-to-live",
+    "storage_bucket": "made-to-live.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763133262016:android:9231c454689b0e80285525",
+        "android_client_info": {
+          "package_name": "com.example.madetoliveapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763133262016-crgk5r563ka47d2rsna7ijlofbkd9g0g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.madetoliveapp",
+            "certificate_hash": "86c8119b08e072f127b15aacb7b0260a3b511397"
+          }
+        },
+        {
+          "client_id": "763133262016-4un4chngrjiegv14r8j4po45v56e9btk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_lVtEMXdLFr7TxO1jx4MSkY60zBNWMaI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763133262016-4un4chngrjiegv14r8j4po45v56e9btk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

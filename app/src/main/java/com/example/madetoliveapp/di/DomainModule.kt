@@ -8,6 +8,7 @@ import com.example.madetoliveapp.domain.usecase.GetTasksForDayUseCase
 import com.example.madetoliveapp.domain.usecase.LoginUseCase
 import com.example.madetoliveapp.domain.usecase.RegisterUseCase
 import com.example.madetoliveapp.domain.usecase.UpdateTaskUseCase
+import com.example.madetoliveapp.domain.usecase.GoogleAuthUseCase
 
 val domainModule = module {
     // Use cases
@@ -18,5 +19,7 @@ val domainModule = module {
     factory { UpdateTaskUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { LoginUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { RegisterUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { RegisterUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { GoogleAuthUseCase(get()) } // Assuming use case depends on TaskRepository
 
 }

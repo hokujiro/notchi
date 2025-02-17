@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Madetoliveapp"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.daily.MainActivity"
+            android:name=".presentation.auth.AuthActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +25,7 @@
         </activity>
         <activity android:name=".presentation.home.HomeActivity" />
         <activity android:name=".presentation.rewards.RewardsActivity" />
-        <activity android:name=".presentation.auth.AuthActivity" />
+        <activity android:name=".presentation.daily.MainActivity" />
 
         <activity android:name="io.appwrite.views.CallbackActivity" android:exported="true">
             <intent-filter android:label="android_web_auth">

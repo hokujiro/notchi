@@ -1,10 +1,12 @@
 package com.example.madetoliveapp.presentation.auth
 
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
+import android.content.ContentValues.TAG
+import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.launch
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,25 +28,47 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.PasswordCredential
+import androidx.credentials.PublicKeyCredential
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.lifecycleScope
+import com.example.madetoliveapp.BuildConfig
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import org.koin.androidx.compose.koinViewModel
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
+import java.util.Collections
 
 
 class AuthActivity : AppCompatActivity() {
+
+    private lateinit var credentialManager: CredentialManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AuthScreen()
         }
     }
+
 }
 @Composable
 fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
@@ -52,20 +76,18 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-
-
     val context = LocalContext.current
-
-    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken("46489336294-jg6ej1gffhd6kcaus95c4ikjm8tvfce2.apps.googleusercontent.com") // Replace with your client ID
-        .requestEmail()
-        .build()
-
-    val googleSignInClient = GoogleSignIn.getClient(context, googleSignInOptions)
-
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        handleGoogleSignInResult(task, viewModel)
+    val scope = rememberCoroutineScope()
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        GoogleSignInUtils.doGoogleSignIn(
+            context = context,
+            scope = scope,
+            launcher = null,
+            login = {
+                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+            },
+            viewModel = viewModel
+        )
     }
 
     Column(
@@ -111,7 +133,16 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
         }
 
         Button(
-            onClick = { launcher.launch(googleSignInClient.signInIntent) },
+            onClick = {
+                GoogleSignInUtils.doGoogleSignIn(
+                    context = context,
+                    scope = scope,
+                    launcher = launcher,
+                    login = {
+                        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                    },
+                    viewModel = viewModel
+                ) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign in with Google")
@@ -147,5 +178,48 @@ private fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>, viewModel:
         }
     } catch (e: ApiException) {
         e.printStackTrace()
+    }
+}
+
+
+fun verifyGoogleIdToken(idTokenString: String, clientId: String) {
+    val transport = NetHttpTransport()
+    val jsonFactory = JacksonFactory.getDefaultInstance()
+
+    val verifier = GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+        .setAudience(Collections.singletonList(clientId)) // Set your CLIENT_ID
+        .build()
+
+    try {
+        val idToken: GoogleIdToken? = verifier.verify(idTokenString)
+
+        if (idToken != null) {
+            val payload: Payload = idToken.payload
+
+            // Extract user details
+            val userId = payload.subject
+            val email = payload.email
+            val emailVerified = payload.emailVerified ?: false
+            val name = payload["name"] as? String
+            val pictureUrl = payload["picture"] as? String
+            val locale = payload["locale"] as? String
+            val familyName = payload["family_name"] as? String
+            val givenName = payload["given_name"] as? String
+
+            // Print user details
+            println("User ID: $userId")
+            println("Email: $email (Verified: $emailVerified)")
+            println("Name: $name")
+            println("Picture URL: $pictureUrl")
+            println("Locale: $locale")
+            println("Family Name: $familyName")
+            println("Given Name: $givenName")
+
+            // Use or store profile information
+        } else {
+            println("Invalid ID token.")
+        }
+    } catch (e: Exception) {
+        println("Token verification failed: ${e.message}")
     }
 }
