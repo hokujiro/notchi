@@ -35,7 +35,7 @@ import com.example.madetoliveapp.domain.model.TaskModel
 @Composable
 fun TaskComponent(
     tasks: List<TaskModel>,
-    onTaskClick: (Int) -> Unit,
+    onTaskClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -50,7 +50,7 @@ fun TaskComponent(
 }
 
 @Composable
-fun TaskItem(task: TaskModel, onTaskClick: (Int) -> Unit) {
+fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

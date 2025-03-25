@@ -6,7 +6,7 @@ import com.example.madetoliveapp.data.entity.SubTaskEntity
 import java.util.Date
 
 data class TaskModel (
-    val uid: Int = 0,
+    val uid: String = "",
     val checked: Boolean,
     val title: String = "Title",
     val subTasks: List<SubTaskModel>?,

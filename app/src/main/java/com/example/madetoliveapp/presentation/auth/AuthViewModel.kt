@@ -1,5 +1,7 @@
 package com.example.madetoliveapp.presentation.auth
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,23 +43,21 @@ class AuthViewModel(
         }
     }
 
-    fun loginWithGoogle(idToken: String) {
+    fun loginWithGoogle(idToken: String, context: Context) {
         viewModelScope.launch {
                 // Step 1: Create a request to send the token to your backend
-            val response =  googleAuthUseCase(GoogleAuthRequest(idToken))
-            uiState = response.fold(
-                onSuccess = { "Login successful: ${it.token}" },
-                onFailure = { it.message ?: "An error occurred during login" }
+            val response = googleAuthUseCase(GoogleAuthRequest(idToken))
+            response.fold(
+                onSuccess = {
+                    // ✅ Store JWT token returned by backend
+                    val jwt = it.token
+                    val prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("jwt_token", jwt).apply()
+                },
+                onFailure = {
+                    // Handle failure
+                }
             )
-            response.onSuccess {
-                // Store authentication token for session management
-                saveAuthToken(it.token)
-            }
         }
-    }
-
-    // Save the authentication token in SharedPreferences or DataStore
-    private fun saveAuthToken(token: String) {
-        // Implementation to securely store the token
     }
 }

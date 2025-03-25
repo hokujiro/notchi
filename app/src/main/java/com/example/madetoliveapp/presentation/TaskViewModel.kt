@@ -27,7 +27,7 @@ class TaskViewModel(
     val tasks: StateFlow<List<TaskModel>> = _tasks.asStateFlow()
 
     // Método para marcar una tarea como completada
-    fun toggleTaskCompletion(taskId: Int) {
+    fun toggleTaskCompletion(taskId: String) {
         viewModelScope.launch {
             val taskToUpdate = _tasks.value.find { it.uid == taskId }
             taskToUpdate?.let { task ->

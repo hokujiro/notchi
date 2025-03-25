@@ -24,4 +24,8 @@ interface RemoteMapper {
         subTaskModel: List<SubTaskModel>
     ): List<SubTaskEntity>
 
+    fun toDomainModel(
+        entity: TaskEntity
+    ): TaskModel
+
 }

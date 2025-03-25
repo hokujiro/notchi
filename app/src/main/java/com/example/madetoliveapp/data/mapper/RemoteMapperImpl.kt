@@ -27,12 +27,12 @@ class RemoteMapperImpl : RemoteMapper {
         }
 
     override fun toEntity(model: TaskModel): TaskEntity =
-        with(model){
+        with(model) {
             TaskEntity(
-                uid=uid,
+                uid = uid,
                 checked = checked,
                 title = title,
-                subTasks =  toSubTasksEntity(subTasks ?: emptyList()),
+                subTasks = toSubTasksEntity(subTasks ?: emptyList()),
                 category = category,
                 finishingDate = finishingDate.time,
                 points = points
@@ -66,7 +66,19 @@ class RemoteMapperImpl : RemoteMapper {
 
     private fun dateToString(date: Date, format: String = "yyyy-MM-dd"): String? {
         val dateFormatter = SimpleDateFormat(format)
-           return dateFormatter.format(date)
-        }
+        return dateFormatter.format(date)
     }
+
+    override fun toDomainModel(entity: TaskEntity): TaskModel {
+        return TaskModel(
+            uid = entity.uid,
+            checked = entity.checked,
+            title = entity.title,
+            category = entity.category,
+            subTasks = toSubTasksModel(entity.subTasks ?: emptyList()),
+            finishingDate = Date(entity.finishingDate),
+            points = entity.points
+        )
+    }
+}
 

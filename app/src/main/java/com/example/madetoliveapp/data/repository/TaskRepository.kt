@@ -7,6 +7,6 @@ interface TaskRepository {
     suspend fun getAllTasks(): List<TaskModel> // Fetch all tasks
     suspend fun getTasksForDay(date: Long): List<TaskModel> // Fetch all tasks
     suspend fun insertTask(task: TaskModel) // Insert multiple tasks
-    suspend fun deleteTask(task: TaskModel) // Delete a task
+    suspend fun deleteTask(id: String) // Delete a task
     suspend fun updateTask(task: TaskModel) // Update a task
 }

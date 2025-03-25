@@ -62,7 +62,7 @@ class GoogleSignInUtils {
                                 user?.let {
                                     if(it.isAnonymous.not()){
                                         login.invoke()
-                                        viewModel.loginWithGoogle(googleTokenId)
+                                        viewModel.loginWithGoogle(googleTokenId, context)
                                     }
                                 }
                             }

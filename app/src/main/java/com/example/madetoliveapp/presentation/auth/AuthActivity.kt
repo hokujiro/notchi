@@ -1,11 +1,10 @@
 package com.example.madetoliveapp.presentation.auth
 
 
-import android.content.ContentValues.TAG
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.launch
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -35,27 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.PasswordCredential
-import androidx.credentials.PublicKeyCredential
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.lifecycle.lifecycleScope
-import com.example.madetoliveapp.BuildConfig
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.example.madetoliveapp.presentation.home.HomeActivity
 import org.koin.androidx.compose.koinViewModel
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.jackson2.JacksonFactory
-import java.util.Collections
 
 
 class AuthActivity : AppCompatActivity() {
@@ -70,6 +50,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
 }
+
 @Composable
 fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
     var isLoginMode by remember { mutableStateOf(true) } // Toggle between Login and Register
@@ -78,17 +59,22 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
     var message by remember { mutableStateOf("") }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
-        GoogleSignInUtils.doGoogleSignIn(
-            context = context,
-            scope = scope,
-            launcher = null,
-            login = {
-                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-            },
-            viewModel = viewModel
-        )
+    val onLoginSuccess = {
+        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+        context.startActivity(Intent(context, HomeActivity::class.java))
+        if (context is Activity) context.finish()
     }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+            GoogleSignInUtils.doGoogleSignIn(
+                context = context,
+                scope = scope,
+                launcher = null,
+                login = onLoginSuccess,
+                viewModel = viewModel
+            )
+        }
+
 
     Column(
         modifier = Modifier
@@ -107,7 +93,9 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             )
         }
 
@@ -116,18 +104,24 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
             onValueChange = { password = it },
             label = { Text("Password") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         Button(
             onClick = {
-                if (isLoginMode) {
-                    viewModel.login(username, password)
-                } else {
-                    viewModel.register(username, password)
-                }
+                GoogleSignInUtils.doGoogleSignIn(
+                    context = context,
+                    scope = scope,
+                    launcher = launcher,
+                    login = onLoginSuccess,
+                    viewModel = viewModel
+                )
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
         ) {
             Text(if (isLoginMode) "Login" else "Register")
         }
@@ -142,7 +136,8 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     },
                     viewModel = viewModel
-                ) },
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign in with Google")
@@ -170,56 +165,3 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
     }
 }
 
-private fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>, viewModel: AuthViewModel) {
-    try {
-        val account = task.getResult(ApiException::class.java)
-        account?.idToken?.let { token ->
-            viewModel.loginWithGoogle(token)
-        }
-    } catch (e: ApiException) {
-        e.printStackTrace()
-    }
-}
-
-
-fun verifyGoogleIdToken(idTokenString: String, clientId: String) {
-    val transport = NetHttpTransport()
-    val jsonFactory = JacksonFactory.getDefaultInstance()
-
-    val verifier = GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-        .setAudience(Collections.singletonList(clientId)) // Set your CLIENT_ID
-        .build()
-
-    try {
-        val idToken: GoogleIdToken? = verifier.verify(idTokenString)
-
-        if (idToken != null) {
-            val payload: Payload = idToken.payload
-
-            // Extract user details
-            val userId = payload.subject
-            val email = payload.email
-            val emailVerified = payload.emailVerified ?: false
-            val name = payload["name"] as? String
-            val pictureUrl = payload["picture"] as? String
-            val locale = payload["locale"] as? String
-            val familyName = payload["family_name"] as? String
-            val givenName = payload["given_name"] as? String
-
-            // Print user details
-            println("User ID: $userId")
-            println("Email: $email (Verified: $emailVerified)")
-            println("Name: $name")
-            println("Picture URL: $pictureUrl")
-            println("Locale: $locale")
-            println("Family Name: $familyName")
-            println("Given Name: $givenName")
-
-            // Use or store profile information
-        } else {
-            println("Invalid ID token.")
-        }
-    } catch (e: Exception) {
-        println("Token verification failed: ${e.message}")
-    }
-}

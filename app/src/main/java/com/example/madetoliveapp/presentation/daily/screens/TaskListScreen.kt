@@ -63,7 +63,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
 }
 
 @Composable
-fun TaskList(tasks: List<TaskModel>, onTaskClick: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(tasks: List<TaskModel>, onTaskClick: (String) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier.padding(bottom = 56.dp)
             .padding(WindowInsets.systemBars.asPaddingValues()) // Account for system bars
@@ -75,7 +75,7 @@ fun TaskList(tasks: List<TaskModel>, onTaskClick: (Int) -> Unit, modifier: Modif
 }
 
 @Composable
-fun TaskItem(task: TaskModel, onTaskClick: (Int) -> Unit) {
+fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
