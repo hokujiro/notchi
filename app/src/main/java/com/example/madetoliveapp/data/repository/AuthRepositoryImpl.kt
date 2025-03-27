@@ -19,7 +19,7 @@ class AuthRepositoryImpl(
     }
 
     // Fetch all tasks from the database
-    override suspend fun register(authRequest: AuthRequest): Call<Void> {
+    override suspend fun register(authRequest: AuthRequest): Response<AuthResponse> {
         return authApi.register(authRequest)
     }
 

@@ -9,6 +9,7 @@ import com.example.madetoliveapp.domain.usecase.DeleteTaskUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksForDayUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
 import com.example.madetoliveapp.domain.usecase.UpdateTaskUseCase
+import com.example.madetoliveapp.presentation.auth.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,7 @@ class TaskViewModel(
     private val getTasksForDayUseCase: GetTasksForDayUseCase,
     private val addTaskUseCase: AddTaskUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase
+    private val deleteTaskUseCase: DeleteTaskUseCase,
 )  : ViewModel() {
 
     // Lista de tareas como StateFlow (mejor integración con Compose)

@@ -13,18 +13,23 @@ import retrofit2.http.Path
 interface TaskApi {
 
     // Endpoint for user login
-    @GET("tasks")
-    fun getAllTasks(): Response<List<TaskEntity>>
+    @GET("api/tasks/all")
+    suspend fun getAllTasks(): Response<List<TaskEntity>>
 
     @GET("tasks/by-date")
-    suspend fun getTasksForDay(@Query("date") date: Long): Response<List<TaskEntity>>
+    suspend fun getTasksForDay(
+        @Query("date") date: Long
+    ): Response<List<TaskEntity>>
 
-    @POST("tasks")
+    @POST("api/tasks")
     suspend fun insertTask(@Body task: TaskEntity): Response<Unit>
 
-    @DELETE("tasks/{id}")
+    @DELETE("api/tasks/{id}")
     suspend fun deleteTask(@Path("id") id: String): Response<Unit>
 
-    @PUT("tasks/{id}")
+    @PUT("api/tasks/{id}")
     suspend fun updateTask(@Path("id") id: String, @Body task: TaskEntity): Response<Unit>
+
+    @GET("api/tasks/completed")
+    suspend fun getCompletedTasks(@Path("userId") userId: Long): Response<List<TaskEntity>>
 }
