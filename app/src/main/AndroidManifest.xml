@@ -30,6 +30,7 @@
         <activity android:name=".presentation.home.HomeActivity" />
         <activity android:name=".presentation.rewards.RewardsActivity" />
         <activity android:name=".presentation.daily.TaskActivity" />
+        <activity android:name=".presentation.settings.SettingsActivity" />
 
         <activity android:name="io.appwrite.views.CallbackActivity" android:exported="true">
             <intent-filter android:label="android_web_auth">
