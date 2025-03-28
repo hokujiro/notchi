@@ -16,7 +16,7 @@ interface TaskApi {
     @GET("api/tasks/all")
     suspend fun getAllTasks(): Response<List<TaskEntity>>
 
-    @GET("tasks/by-date")
+    @GET("api/tasks/by-date")
     suspend fun getTasksForDay(
         @Query("date") date: Long
     ): Response<List<TaskEntity>>

@@ -151,8 +151,6 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-
-        if (!isLoginMode) {
             TextField(
                 value = username,
                 onValueChange = { username = it },
@@ -161,7 +159,7 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             )
-        }
+
 
         TextField(
             value = password,

@@ -1,6 +1,7 @@
 package com.example.madetoliveapp.di
 
 import android.content.Context
+import android.util.Log
 import org.koin.dsl.module
 import androidx.room.Room
 import com.example.madetoliveapp.data.mapper.RemoteMapper
@@ -91,6 +92,7 @@ class TokenInterceptor(private val tokenManager: TokenManager) : Interceptor {
         val requestBuilder = chain.request().newBuilder()
 
         val token = tokenManager.getToken()
+        Log.d("TokenInterceptor", "Token: $token")
         if (!token.isNullOrEmpty()) {
             requestBuilder.addHeader("Authorization", "Bearer $token")
         }

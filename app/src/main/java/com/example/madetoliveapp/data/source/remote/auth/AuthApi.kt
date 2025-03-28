@@ -11,7 +11,7 @@ interface AuthApi {
 
     // Endpoint for user login
     @POST("api/auth/login")
-    suspend fun login(@Body authRequest: AuthRequest): Call<AuthResponse>
+    suspend fun login(@Body authRequest: AuthRequest): Response<AuthResponse>
 
     // Endpoint for user registration
     @POST("api/auth/register")

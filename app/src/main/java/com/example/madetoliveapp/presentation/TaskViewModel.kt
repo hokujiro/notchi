@@ -1,5 +1,6 @@
 package com.example.madetoliveapp.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.madetoliveapp.data.entity.TaskEntity
@@ -40,12 +41,18 @@ class TaskViewModel(
         }
     }
 //testing new repo
-    fun getAllTasks() {
-        viewModelScope.launch {
+fun getAllTasks() {
+    viewModelScope.launch {
+        try {
             val result = getAllTasksUseCase.execute()
             _tasks.value = result
+        } catch (e: Exception) {
+            // Handle the error gracefully, log it, or update UI state
+            Log.e("TaskViewModel", "Error loading tasks", e)
+            // Optionally show error state to UI
         }
     }
+}
 
     fun getTasksForDay(date: Long) {
         viewModelScope.launch {

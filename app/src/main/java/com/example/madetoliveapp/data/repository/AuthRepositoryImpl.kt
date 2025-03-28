@@ -14,7 +14,7 @@ class AuthRepositoryImpl(
 ) : AuthRepository {
 
     // Fetch all tasks from the database
-    override suspend fun login(authRequest: AuthRequest): Call<AuthResponse> {
+    override suspend fun login(authRequest: AuthRequest): Response<AuthResponse> {
         return authApi.login(authRequest)
     }
 
