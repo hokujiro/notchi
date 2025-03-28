@@ -96,6 +96,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-core:2.8.0"
     implementation 'androidx.compose.material:material-icons-core:1.7.3'
     implementation 'androidx.compose.material:material-icons-extended:1.7.3'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
+
 
     implementation "androidx.compose.material3:material3:1.1.0-beta01" // Or the latest version
     implementation "androidx.compose.foundation:foundation:1.5.0" // Compose Foundation library

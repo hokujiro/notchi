@@ -12,7 +12,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.madetoliveapp.presentation.daily.MainActivity
+import com.example.madetoliveapp.presentation.daily.TaskActivity
 import com.example.madetoliveapp.presentation.home.HomeActivity
 import com.example.madetoliveapp.presentation.rewards.RewardsActivity
 
@@ -38,7 +38,7 @@ fun BottomNavigationBar(selectedRoute: String) {
             selected = selectedRoute == "tasks",
             onClick = {
                 if (selectedRoute != "tasks") {
-                    context.startActivity(Intent(context, MainActivity::class.java))
+                    context.startActivity(Intent(context, TaskActivity::class.java))
                     (context as Activity).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 }
             }
