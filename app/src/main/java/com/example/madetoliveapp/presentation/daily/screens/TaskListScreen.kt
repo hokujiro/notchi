@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.presentation.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material.Icon
@@ -43,7 +42,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                         checked = false,
                         subTasks = listOf(),
                         category = null,
-                        finishingDate = parsedDate,
+                        date = parsedDate,
                         points = null
                     )
                     taskViewModel.addTask(newTask)

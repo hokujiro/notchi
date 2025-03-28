@@ -74,7 +74,7 @@ fun AddTaskDialog(
                         checked = false,
                         subTasks = listOf(),
                         category = category.ifBlank { null },
-                        finishingDate = parsedDate,
+                        date = parsedDate,
                         points = points.toIntOrNull()
                     )
                     onAddTask(newTask) // Pass the task back to the parent

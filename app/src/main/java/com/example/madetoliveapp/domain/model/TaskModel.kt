@@ -1,8 +1,5 @@
 package com.example.madetoliveapp.domain.model
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-import com.example.madetoliveapp.data.entity.SubTaskEntity
 import java.util.Date
 
 data class TaskModel (
@@ -11,6 +8,6 @@ data class TaskModel (
     val title: String = "Title",
     val subTasks: List<SubTaskModel>?,
     val category: String?,
-    val finishingDate: Date,
+    val date: Date?,
     val points: Int?
 )

@@ -20,7 +20,7 @@ class RemoteMapperImpl : RemoteMapper {
                 title = title,
                 subTasks = toSubTasksModel(subTasks ?: emptyList()),
                 category = category,
-                finishingDate = Date(finishingDate),
+                date = stringToDate(date),
                 points = points
 
             )
@@ -34,7 +34,7 @@ class RemoteMapperImpl : RemoteMapper {
                 title = title,
                 subTasks = toSubTasksEntity(subTasks ?: emptyList()),
                 category = category,
-                finishingDate = finishingDate.time,
+                date = dateToString(date),
                 points = points
             )
         }
@@ -59,14 +59,26 @@ class RemoteMapperImpl : RemoteMapper {
         }
 
 
-    private fun stringToDate(dateString: String, format: String = "yyyy-MM-dd"): Date? {
+    private fun stringToDate(dateString: String?, format: String = "yyyy-MM-dd"): Date? {
+        if (dateString.isNullOrBlank()) return null
+
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
-        return dateFormat.parse(dateString)
+        return try {
+            dateFormat.parse(dateString)
+        } catch (e: Exception) {
+            null // or log and return fallback
+        }
     }
 
-    private fun dateToString(date: Date, format: String = "yyyy-MM-dd"): String? {
-        val dateFormatter = SimpleDateFormat(format)
-        return dateFormatter.format(date)
+    private fun dateToString(date: Date?, format: String = "yyyy-MM-dd"): String? {
+        if (date == null) return null
+
+        val dateFormatter = SimpleDateFormat(format, Locale.getDefault())
+        return try {
+            dateFormatter.format(date)
+        } catch (e: Exception) {
+            null // or log the issue
+        }
     }
 
     override fun toDomainModel(entity: TaskEntity): TaskModel {
@@ -76,7 +88,7 @@ class RemoteMapperImpl : RemoteMapper {
             title = entity.title,
             category = entity.category,
             subTasks = toSubTasksModel(entity.subTasks ?: emptyList()),
-            finishingDate = Date(entity.finishingDate),
+            date = stringToDate(entity.date),
             points = entity.points
         )
     }

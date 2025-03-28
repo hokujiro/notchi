@@ -21,7 +21,7 @@ interface TaskApi {
         @Query("date") date: Long
     ): Response<List<TaskEntity>>
 
-    @POST("api/tasks")
+    @POST("api/tasks/add")
     suspend fun insertTask(@Body task: TaskEntity): Response<Unit>
 
     @DELETE("api/tasks/{id}")
