@@ -42,7 +42,8 @@ import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.madetoliveapp.BuildConfig
-import com.example.madetoliveapp.presentation.home.HomeActivity
+import com.example.madetoliveapp.presentation.rewards.RewardsActivity
+import com.example.madetoliveapp.presentation.tasks.TasksActivity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.GoogleAuthProvider
@@ -96,7 +97,7 @@ class AuthActivity : AppCompatActivity() {
                         val viewModel: AuthViewModel = ViewModelProvider(this@AuthActivity)[AuthViewModel::class.java]
                         viewModel.loginWithGoogle(token, this@AuthActivity)
                         // You may navigate directly here too if you want to skip ViewModel
-                        val intent = Intent(this@AuthActivity, HomeActivity::class.java)
+                        val intent = Intent(this@AuthActivity, TasksActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
@@ -122,7 +123,7 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
     val scope = rememberCoroutineScope()
     val onLoginSuccess = {
         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-        context.startActivity(Intent(context, HomeActivity::class.java))
+        context.startActivity(Intent(context, RewardsActivity::class.java))
         if (context is Activity) context.finish()
     }
     val shouldNavigate by viewModel.navigateToHome.collectAsState()
@@ -225,7 +226,7 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
 
     LaunchedEffect(shouldNavigate) {
         if (shouldNavigate) {
-            val intent = Intent(context, HomeActivity::class.java)
+            val intent = Intent(context, RewardsActivity::class.java)
             context.startActivity(intent)
             // You might want to finish the current activity here via callback if needed
         }

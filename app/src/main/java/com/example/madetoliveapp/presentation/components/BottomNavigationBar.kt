@@ -7,15 +7,17 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarViewWeek
 import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.madetoliveapp.presentation.daily.TaskActivity
-import com.example.madetoliveapp.presentation.home.HomeActivity
+import com.example.madetoliveapp.presentation.projects.ProjectsActivity
 import com.example.madetoliveapp.presentation.rewards.RewardsActivity
+import com.example.madetoliveapp.presentation.tasks.TasksActivity
 import com.example.madetoliveapp.presentation.settings.SettingsActivity
 
 @Composable
@@ -24,23 +26,23 @@ fun BottomNavigationBar(selectedRoute: String) {
 
     BottomNavigation {
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
-            selected = selectedRoute == "home",
+            icon = { Icon(Icons.Default.BarChart, contentDescription = "Daily") },
+            label = { Text("Daily") },
+            selected = selectedRoute == "daily",
             onClick = {
-                if (selectedRoute != "home") {
-                    context.startActivity(Intent(context, HomeActivity::class.java))
+                if (selectedRoute != "daily") {
+                    context.startActivity(Intent(context, TasksActivity::class.java))
                     (context as Activity).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 }
             }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "Tasks") },
-            label = { Text("Tasks") },
-            selected = selectedRoute == "tasks",
+            icon = { Icon(Icons.Default.CalendarViewWeek, contentDescription = "Projects") },
+            label = { Text("Projects") },
+            selected = selectedRoute == "projects",
             onClick = {
-                if (selectedRoute != "tasks") {
-                    context.startActivity(Intent(context, TaskActivity::class.java))
+                if (selectedRoute != "projects") {
+                    context.startActivity(Intent(context, ProjectsActivity::class.java))
                     (context as Activity).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 }
             }

@@ -1,6 +1,5 @@
 package com.example.madetoliveapp.presentation.auth
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -14,7 +13,7 @@ import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthRequest
 import com.example.madetoliveapp.domain.usecase.GoogleAuthUseCase
 import com.example.madetoliveapp.domain.usecase.LoginUseCase
 import com.example.madetoliveapp.domain.usecase.RegisterUseCase
-import com.example.madetoliveapp.presentation.home.HomeActivity
+import com.example.madetoliveapp.presentation.rewards.RewardsActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -74,7 +73,7 @@ class AuthViewModel(
                     prefs.edit().putString("jwt_token", jwt).apply()
 
                     // ✅ Navigate to HomeActivity
-                    val intent = Intent(context, HomeActivity::class.java)
+                    val intent = Intent(context, RewardsActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     context.startActivity(intent)
                 },

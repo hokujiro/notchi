@@ -6,7 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.madetoliveapp.presentation.auth.AuthActivity
 import com.example.madetoliveapp.presentation.auth.TokenManager
-import com.example.madetoliveapp.presentation.home.HomeActivity
+import com.example.madetoliveapp.presentation.rewards.RewardsActivity
+import com.example.madetoliveapp.presentation.tasks.TasksActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         if (!token.isNullOrEmpty()) {
             // User is "logged in" – navigate to Home
-            startActivity(Intent(this, HomeActivity::class.java))
+            startActivity(Intent(this, TasksActivity::class.java))
         } else {
             // No token – navigate to Login/Register
             startActivity(Intent(this, AuthActivity::class.java))

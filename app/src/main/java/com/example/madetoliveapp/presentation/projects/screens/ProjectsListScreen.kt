@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.presentation.daily.screens
+package com.example.madetoliveapp.presentation.projects.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,7 +32,7 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     }
     // Mostrar la lista de tareas
     Scaffold(
-        bottomBar = { BottomNavigationBar(selectedRoute = "tasks") },
+        bottomBar = { BottomNavigationBar(selectedRoute = "projects") },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
