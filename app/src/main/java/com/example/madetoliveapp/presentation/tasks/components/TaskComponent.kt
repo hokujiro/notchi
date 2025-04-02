@@ -65,7 +65,7 @@ fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
             .clip(RoundedCornerShape(16.dp))
             .clickable { onTaskClick(task.uid) },
         elevation = CardDefaults.cardElevation(4.dp),
@@ -74,7 +74,7 @@ fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(

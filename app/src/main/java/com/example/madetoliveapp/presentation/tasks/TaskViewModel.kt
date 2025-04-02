@@ -15,8 +15,11 @@ import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
 import com.example.madetoliveapp.domain.usecase.GetUserPointsUseCase
 import com.example.madetoliveapp.domain.usecase.UpdateTaskUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TaskViewModel(
@@ -38,9 +41,43 @@ class TaskViewModel(
     private val _projects = MutableStateFlow<List<ProjectModel>>(emptyList())
     val projects: StateFlow<List<ProjectModel>> = _projects.asStateFlow()
 
-
     private val _totalPoints = MutableStateFlow(0)
     val totalPoints: StateFlow<Int> = _totalPoints
+
+    private val _taskFilter = MutableStateFlow(TaskFilter.ALL)
+    val taskFilter = _taskFilter.asStateFlow()
+
+    private val _sortMode = MutableStateFlow(SortMode.BY_POINTS)
+    val sortMode = _sortMode.asStateFlow()
+
+    val visibleTasks = combine(_tasks, _taskFilter, _sortMode) { allTasks, filter, sort ->
+        val filtered = when (filter) {
+            TaskFilter.ALL -> allTasks
+            TaskFilter.POSITIVE -> allTasks.filter { (it.points ?: 0) > 0 }
+            TaskFilter.NEGATIVE -> allTasks.filter { (it.points ?: 0) < 0 }
+        }
+
+        val sorted = filtered.sortedWith(
+            when (sort) {
+                SortMode.BY_POINTS -> compareBy<TaskModel> { it.checked }
+                    .thenByDescending { it.points ?: 0 }
+
+                SortMode.BY_CREATION -> compareBy<TaskModel> { it.checked }
+                    .thenBy { it.date }
+            }
+        )
+
+        sorted
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    open fun setFilter(filter: TaskFilter) {
+        _taskFilter.value = filter
+    }
+
+    open fun toggleSortMode() {
+        _sortMode.value = if (_sortMode.value == SortMode.BY_POINTS) SortMode.BY_CREATION else SortMode.BY_POINTS
+    }
+
 
     // Método para marcar una tarea como completada
     fun toggleTaskCompletion(taskId: String) {
@@ -123,3 +160,6 @@ fun getAllTasks() {
         }
     }
 }
+
+enum class TaskFilter { ALL, POSITIVE, NEGATIVE }
+enum class SortMode { BY_POINTS, BY_CREATION }

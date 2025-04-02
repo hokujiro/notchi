@@ -98,7 +98,7 @@ fun Content(
     LazyRow(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
     ) {
         items(items = data.visibleDates) { day ->
             ContentItem(
@@ -117,7 +117,6 @@ fun ContentItem(
 ) {
     Card(
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 4.dp)
             .clickable { // making the element clickable, by adding 'clickable' modifier
                 onClickListener(date)
             },
@@ -132,7 +131,7 @@ fun ContentItem(
         Column(
             modifier = Modifier
                 .width(48.dp)
-                .height(48.dp)
+                .height(52.dp)
                 .padding(4.dp)
         ) {
             Text(
