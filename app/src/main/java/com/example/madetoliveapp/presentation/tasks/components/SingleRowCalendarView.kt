@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.presentation.components
+package com.example.madetoliveapp.presentation.tasks.components
 
 
 import androidx.compose.foundation.clickable
@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.extensions.CalendarDataSource
 import com.example.madetoliveapp.presentation.extensions.toLocalDate
@@ -132,7 +131,7 @@ fun ContentItem(
     ) {
         Column(
             modifier = Modifier
-                .width(42.dp)
+                .width(48.dp)
                 .height(48.dp)
                 .padding(4.dp)
         ) {
@@ -163,7 +162,8 @@ fun Header(
                 ),
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            style = MaterialTheme.typography.bodyLarge
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)

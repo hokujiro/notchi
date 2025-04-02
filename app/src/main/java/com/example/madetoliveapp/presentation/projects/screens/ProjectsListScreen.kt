@@ -7,54 +7,46 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.madetoliveapp.presentation.TaskViewModel
+import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import com.example.madetoliveapp.domain.model.TaskModel
+import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
-import java.text.SimpleDateFormat
-import java.util.Date
 
 
 @Composable
-fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
-    // Obtener las tareas desde el ViewModel
-    val tasks by taskViewModel.tasks.collectAsState()
-    val dateFormat = SimpleDateFormat("d-MM-yyyy")
+fun ProjectsListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
+    // Obtener los proyectos desde el ViewModel
+    val projects by taskViewModel.projects.collectAsState()
 
     LaunchedEffect(Unit) {
-       taskViewModel.getAllTasks()
+       taskViewModel.getAllProjects()
     }
-    // Mostrar la lista de tareas
+    // Mostrar la lista de proyectos
     Scaffold(
         bottomBar = { BottomNavigationBar(selectedRoute = "projects") },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    val parsedDate: Date = dateFormat.parse("2-10-2013") as Date
-                    val newTask = TaskModel(
-                        title = "Nueva tarea",
-                        checked = false,
-                        subTasks = listOf(),
-                        category = null,
-                        date = parsedDate,
-                        points = null
+                    val newProject = ProjectModel(
+                        title = "Nuevo project",
+                        tasksList = listOf(),
+                        color = "Color"
                     )
-                    taskViewModel.addTask(newTask)
+                    taskViewModel.addProject(newProject)
                 },
                 modifier = Modifier.padding(16.dp) // Adjust padding to prevent overlap
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar tarea")
+                Icon(Icons.Default.Add, contentDescription = "Add project")
             }
         }
     ) { paddingValues ->
-        TaskList(
-            tasks = tasks,
+        ProjectsList(
+            projects = projects,
             onTaskClick = taskViewModel::toggleTaskCompletion,
             modifier = Modifier.padding(paddingValues) // Apply padding from Scaffold
         )
@@ -62,24 +54,24 @@ fun TaskListScreen(taskViewModel: TaskViewModel = koinViewModel()) {
 }
 
 @Composable
-fun TaskList(tasks: List<TaskModel>, onTaskClick: (String) -> Unit, modifier: Modifier = Modifier) {
+fun ProjectsList(projects: List<ProjectModel>, onTaskClick: (String) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier.padding(bottom = 56.dp)
             .padding(WindowInsets.systemBars.asPaddingValues()) // Account for system bars
     ) {
-        items(tasks) { task ->
-            TaskItem(task, onTaskClick)
+        items(projects) { project ->
+            ProjectItem(project, onTaskClick)
         }
     }
 }
 
 @Composable
-fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
+fun ProjectItem(project: ProjectModel, onProjectClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onTaskClick(task.uid) },
+            .clickable { onProjectClick(project.uid) },
         elevation = 4.dp
     ) {
         Row(
@@ -88,15 +80,10 @@ fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(
-                checked = task.checked,
-                onCheckedChange = { onTaskClick(task.uid) }
-            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = task.title,
+                text = project.title,
                 style = MaterialTheme.typography.body1,
-                textDecoration = if (task.checked) TextDecoration.LineThrough else null
             )
         }
     }

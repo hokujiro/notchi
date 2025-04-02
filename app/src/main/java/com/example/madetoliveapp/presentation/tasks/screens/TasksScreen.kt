@@ -1,21 +1,24 @@
 package com.example.madetoliveapp.presentation.tasks.screens
 
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,21 +29,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.madetoliveapp.presentation.TaskViewModel
-import com.example.madetoliveapp.presentation.components.AddTaskDialog
+import androidx.compose.ui.unit.sp
+import com.example.madetoliveapp.presentation.tasks.TaskViewModel
+import com.example.madetoliveapp.presentation.tasks.components.AddTaskDialog
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
-import com.example.madetoliveapp.presentation.components.CalendarHeader
-import com.example.madetoliveapp.presentation.components.TaskComponent
+import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
+import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
+import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingMenu
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 
 @Composable
-fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
+fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
 
     var selectedDate by remember {
         mutableLongStateOf(
@@ -49,34 +52,46 @@ fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     }
     // Obtener las tareas desde el ViewModel
     val tasks by taskViewModel.tasks.collectAsState()
-    val dateFormat = SimpleDateFormat("d-MM-yyyy")
-    val openDialog = remember { mutableStateOf(false) } // State to control dialog visibility
+    val projects by taskViewModel.projects.collectAsState()
+    val totalPoints by taskViewModel.totalPoints.collectAsState() // Make sure this exists!
+    var openCreateTaskDialog = remember { mutableStateOf(false) } // State to control dialog visibility
+    var isFabExpanded by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
         taskViewModel.getTasksForDay(selectedDate)
     }
+    LaunchedEffect(Unit) {
+        taskViewModel.loadUserPoints()
+    }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(selectedRoute = "daily") },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick =  { openDialog.value = true },
-                modifier = Modifier.padding(16.dp) // Adjust padding to prevent overlap
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar tarea")
-            }
+            CircularFloatingMenu(
+                isExpanded = isFabExpanded,
+                onToggle = { isFabExpanded = !isFabExpanded },
+                onActionClick = { index ->
+                    isFabExpanded = false
+                    when (index) {
+                        0 -> { openCreateTaskDialog.value = true} // Add Task
+                        1 -> {/* handle add project */ }
+                        2 -> {/* handle add habit */ }
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         val outerScrollState = rememberScrollState()
-        if (openDialog.value) {
+        if (openCreateTaskDialog.value) {
             AddTaskDialog(
-                onDismiss = { openDialog.value = false },
+                onDismiss = { openCreateTaskDialog.value = false },
                 onAddTask = { newTask ->
                     taskViewModel.addTask(newTask)
-                    openDialog.value = false
+                    openCreateTaskDialog.value = false
                 },
-                selectedDate = selectedDate
+                selectedDate = selectedDate,
+                projects = projects
             )
         }
         Column(
@@ -84,23 +99,40 @@ fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(outerScrollState)
-                .pointerInput(Unit) {
-                    detectSingleHorizontalSwipe { isSwipeLeft ->
-                        val currentDate = LocalDate.ofEpochDay(selectedDate / (24 * 60 * 60 * 1000))
-                        val newDate = if (isSwipeLeft) {
-                            currentDate.plusDays(1)
-                        } else {
-                            currentDate.minusDays(1)
-                        }
-                        selectedDate = newDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        taskViewModel.getTasksForDay(selectedDate)
-                    }
-                }
 
         ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(text = "Rewards Screen", style = MaterialTheme.typography.h4)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Profile Icon
+                IconButton(
+                    onClick = { /* TODO: Navigate to profile or show menu */ },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Text(
+                    text = "⭐ $totalPoints points",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 18.sp
+                    )
+                )
             }
+
             CalendarHeader(
                 modifier = Modifier.fillMaxWidth(),
                 selectedDate = selectedDate,
@@ -119,24 +151,6 @@ fun RewardsScreen(taskViewModel: TaskViewModel = koinViewModel()) {
             )
         }
     }
-}
-
-suspend fun PointerInputScope.detectSingleHorizontalSwipe(onSwipe: (isSwipeLeft: Boolean) -> Unit) {
-    var direction = true
-    detectHorizontalDragGestures(
-        onDragEnd = {
-            // Trigger the swipe callback once the drag ends
-            onSwipe(direction) // Call the callback (true for left swipe, false for right swipe)
-        },
-        onHorizontalDrag = { change, dragAmount ->
-            change.consume()
-            if (dragAmount < 0) {
-                direction = true// Swipe left
-            } else if (dragAmount > 0) {
-                direction = false // Swipe right
-            }// Consume gesture changes
-        }
-    )
 }
 
 

@@ -10,7 +10,7 @@ data class TaskEntity(
     @ColumnInfo(name = "checked") val checked: Boolean,
     @ColumnInfo(name = "title") val title: String = "Title",
     @ColumnInfo(name = "subTasks") val subTasks: List<SubTaskEntity>?,
-    @ColumnInfo(name = "category") val category: String?,
+    @ColumnInfo(name = "project") val project: TaskProjectEntity? = null,
     @ColumnInfo(name = "date") val date: String?,
     @ColumnInfo(name = "points") val points: Int?
 )

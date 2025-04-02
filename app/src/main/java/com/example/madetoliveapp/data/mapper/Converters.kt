@@ -2,6 +2,7 @@ package com.example.madetoliveapp.data.mapper
 
 import androidx.room.TypeConverter
 import com.example.madetoliveapp.data.entity.SubTaskEntity
+import com.example.madetoliveapp.data.entity.TaskProjectEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -21,6 +22,18 @@ class Converters {
             val listType = object : TypeToken<List<SubTaskEntity>>() {}.type
             gson.fromJson(it, listType)
         }
+    }
+
+
+    @TypeConverter
+    fun fromProject(value: TaskProjectEntity?): String {
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    fun toProject(value: String): TaskProjectEntity? {
+        val type = object : TypeToken<TaskProjectEntity>() {}.type
+        return gson.fromJson(value, type)
     }
 
 }

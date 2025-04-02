@@ -44,6 +44,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.madetoliveapp.BuildConfig
 import com.example.madetoliveapp.presentation.rewards.RewardsActivity
 import com.example.madetoliveapp.presentation.tasks.TasksActivity
+import com.example.madetoliveapp.presentation.theme.MadeToLiveTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.GoogleAuthProvider
@@ -62,7 +63,9 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
        checkIfGoogleAccountIsSignedIn()
         setContent {
-            AuthScreen()
+            MadeToLiveTheme {
+                AuthScreen()
+            }
         }
     }
 

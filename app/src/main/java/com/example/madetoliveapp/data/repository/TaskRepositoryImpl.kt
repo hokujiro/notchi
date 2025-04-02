@@ -1,9 +1,8 @@
 package com.example.madetoliveapp.data.repository
 
-import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.mapper.RemoteMapper
-import com.example.madetoliveapp.data.source.local.dao.TaskDao
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
+import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.TaskModel
 
 class TaskRepositoryImpl(
@@ -20,7 +19,7 @@ class TaskRepositoryImpl(
     override suspend fun getAllTasks(): List<TaskModel> {
         val response = taskApi.getAllTasks()
         if (response.isSuccessful) {
-            return response.body()?.map { mapper.toDomainModel(it) } ?: emptyList()
+            return response.body()?.map { mapper.toTaskDomainModel(it) } ?: emptyList()
         } else {
             throw Exception("Failed to load tasks: ${response.errorBody()?.string()}")
         }
@@ -35,7 +34,7 @@ class TaskRepositoryImpl(
     override suspend fun getTasksForDay(date: Long): List<TaskModel> {
         val response = taskApi.getTasksForDay(date)
         if (response.isSuccessful) {
-            return response.body()?.map { mapper.toDomainModel(it) } ?: emptyList()
+            return response.body()?.map { mapper.toTaskDomainModel(it) } ?: emptyList()
         } else {
             throw Exception("Failed to load tasks for date: ${response.errorBody()?.string()}")
         }
@@ -70,6 +69,20 @@ class TaskRepositoryImpl(
     override suspend fun updateTask(task: TaskModel) {
         taskApi.updateTask(task.uid, mapper.toEntity(task))
     }
+
+    override suspend fun addProject(project: ProjectModel) {
+        taskApi.addProject(mapper.toProjectEntity(project))
+    }
+
+    override suspend fun getAllProjects(): List<ProjectModel> {
+        val response = taskApi.getAllProjects()
+        if (response.isSuccessful) {
+            return response.body()?.map { mapper.toProjectDomainModel(it) } ?: emptyList()
+        } else {
+            throw Exception("Failed to load tasks: ${response.errorBody()?.string()}")
+        }
+    }
+
 
 
 

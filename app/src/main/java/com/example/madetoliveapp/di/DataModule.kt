@@ -10,8 +10,11 @@ import com.example.madetoliveapp.data.repository.AuthRepository
 import com.example.madetoliveapp.data.repository.AuthRepositoryImpl
 import com.example.madetoliveapp.data.repository.TaskRepository
 import com.example.madetoliveapp.data.repository.TaskRepositoryImpl
+import com.example.madetoliveapp.data.repository.UserRepository
+import com.example.madetoliveapp.data.repository.UserRepositoryImpl
 import com.example.madetoliveapp.data.source.local.bbdd.AppDatabase
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
+import com.example.madetoliveapp.data.source.remote.api.UserApi
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
 import com.example.madetoliveapp.presentation.auth.TokenManager
 import okhttp3.Interceptor
@@ -60,6 +63,7 @@ val dataModule = module {
     single(named("unauthenticatedRetrofit")) {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
+           // .baseUrl("https://server-m6em.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get(named("unauthenticated")))
             .build()
@@ -69,6 +73,7 @@ val dataModule = module {
     single(named("authenticatedRetrofit")) {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
+           // .baseUrl("https://server-m6em.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get(named("authenticated")))
             .build()
@@ -80,10 +85,12 @@ val dataModule = module {
     // AuthApi
     single<AuthApi> { get<Retrofit>(named("unauthenticatedRetrofit")).create(AuthApi::class.java) }
     single<TaskApi> { get<Retrofit>(named("authenticatedRetrofit")).create(TaskApi::class.java) }
+    single<UserApi> { get<Retrofit>(named("authenticatedRetrofit")).create(UserApi::class.java) }
 
     // Repository
     single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
+    single<UserRepository> { UserRepositoryImpl(get(), get()) }
     single<RemoteMapper> { RemoteMapperImpl() }
 }
 
