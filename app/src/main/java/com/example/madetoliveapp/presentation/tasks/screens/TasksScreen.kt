@@ -1,8 +1,11 @@
 package com.example.madetoliveapp.presentation.tasks.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -86,6 +89,13 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                 projects = projects
             )
         }
+
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
+        ) {
+
         HeaderComponent(totalPoints, paddingValues, outerScrollState)
 
         CalendarHeader(
@@ -106,6 +116,8 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                 .fillMaxWidth()
                 .heightIn(max = 500.dp)
         )
+
+        }
     }
 }
 
