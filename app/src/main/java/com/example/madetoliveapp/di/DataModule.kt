@@ -1,6 +1,5 @@
 package com.example.madetoliveapp.di
 
-import android.content.Context
 import android.util.Log
 import org.koin.dsl.module
 import androidx.room.Room
@@ -16,7 +15,9 @@ import com.example.madetoliveapp.data.source.local.bbdd.AppDatabase
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.data.source.remote.api.UserApi
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
+import com.example.madetoliveapp.data.source.remote.auth.RefreshTokenRequest
 import com.example.madetoliveapp.presentation.auth.TokenManager
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -52,10 +53,9 @@ val dataModule = module {
     single(named("authenticated")) {
         val logging = HttpLoggingInterceptor()
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-
         OkHttpClient.Builder()
             .addInterceptor(logging)
-            .addInterceptor(TokenInterceptor(get()))
+            .addInterceptor(TokenInterceptor(get(), get())) // ✅ Pass authApi
             .build()
     }
 
@@ -94,16 +94,57 @@ val dataModule = module {
     single<RemoteMapper> { RemoteMapperImpl() }
 }
 
-class TokenInterceptor(private val tokenManager: TokenManager) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val requestBuilder = chain.request().newBuilder()
+class TokenInterceptor(
+    private val tokenManager: TokenManager,
+    private val authApi: AuthApi // ✅ Inject AuthApi (unauthenticated)
+) : Interceptor {
 
-        val token = tokenManager.getToken()
-        Log.d("TokenInterceptor", "Token: $token")
-        if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", "Bearer $token")
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val requestBuilder = originalRequest.newBuilder()
+
+        val accessToken = tokenManager.getAccessToken()
+        if (!accessToken.isNullOrEmpty()) {
+            requestBuilder.addHeader("Authorization", "Bearer $accessToken")
         }
 
-        return chain.proceed(requestBuilder.build())
+        val response = chain.proceed(requestBuilder.build())
+
+        // If 401 — try refreshing token
+        if (response.code == 401) {
+            response.close() // 👈 Important to close the original response
+            val refreshToken = tokenManager.getRefreshToken()
+
+            if (!refreshToken.isNullOrEmpty()) {
+                try {
+                    val refreshResponse = runBlocking {
+                        authApi.refreshToken(RefreshTokenRequest(refreshToken))
+                    }
+
+                    if (refreshResponse.isSuccessful) {
+                        val newTokens = refreshResponse.body()
+                        if (newTokens != null) {
+                            tokenManager.saveTokens(newTokens.accessToken, newTokens.refreshToken)
+
+                            // Retry original request with new token
+                            val newRequest = originalRequest.newBuilder()
+                                .removeHeader("Authorization")
+                                .addHeader("Authorization", "Bearer ${newTokens.accessToken}")
+                                .build()
+
+                            return chain.proceed(newRequest)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("TokenInterceptor", "Token refresh failed: ${e.message}")
+                }
+            }
+
+            // Refresh failed → logout
+            tokenManager.clearTokens()
+            tokenManager.notifySessionExpired()
+        }
+
+        return response
     }
 }

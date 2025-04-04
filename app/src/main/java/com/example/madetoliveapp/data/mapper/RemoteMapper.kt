@@ -1,9 +1,11 @@
 package com.example.madetoliveapp.data.mapper
 
+import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.entity.ProjectEntity
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.entity.TaskProjectEntity
+import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
 import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.SubTaskModel
 import com.example.madetoliveapp.domain.model.TaskModel
@@ -42,5 +44,7 @@ interface RemoteMapper {
     fun toTaskProjectEntity(project: TaskProjectModel?): TaskProjectEntity
 
     fun toTaskProjectDomainModel(entity: TaskProjectEntity?): TaskProjectModel
+
+    fun toModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel
 
 }

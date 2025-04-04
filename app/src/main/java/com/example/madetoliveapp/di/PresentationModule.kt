@@ -10,5 +10,5 @@ import org.koin.dsl.module
 val presentationModule = module {
     single { TokenManager(androidContext()) }
     viewModel { TaskViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { AuthViewModel(get(), get(), get(), get()) }
+    viewModel { AuthViewModel(get(), get(), get(), get(), get()) }
 }

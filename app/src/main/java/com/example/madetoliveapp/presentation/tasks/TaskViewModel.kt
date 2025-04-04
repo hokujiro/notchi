@@ -70,11 +70,21 @@ class TaskViewModel(
         sorted
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    open fun setFilter(filter: TaskFilter) {
+    val dailyPoints = combine(tasks, taskFilter) { allTasks, filter ->
+        val filtered = when (filter) {
+            TaskFilter.ALL -> allTasks
+            TaskFilter.POSITIVE -> allTasks.filter { (it.points ?: 0) > 0 }
+            TaskFilter.NEGATIVE -> allTasks.filter { (it.points ?: 0) < 0 }
+        }
+
+        filtered.filter { it.checked }.sumOf { it.points ?: 0 }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    fun setFilter(filter: TaskFilter) {
         _taskFilter.value = filter
     }
 
-    open fun toggleSortMode() {
+    fun toggleSortMode() {
         _sortMode.value = if (_sortMode.value == SortMode.BY_POINTS) SortMode.BY_CREATION else SortMode.BY_POINTS
     }
 

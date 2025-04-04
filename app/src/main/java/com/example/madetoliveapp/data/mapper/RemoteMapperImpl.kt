@@ -1,9 +1,11 @@
 package com.example.madetoliveapp.data.mapper
 
+import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.entity.ProjectEntity
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.entity.TaskProjectEntity
+import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
 import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.SubTaskModel
 import com.example.madetoliveapp.domain.model.TaskModel
@@ -133,6 +135,14 @@ class RemoteMapperImpl : RemoteMapper {
                 )
             },
             color = project.color
+        )
+    }
+
+    override fun toModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel {
+        return DailyPointsSummaryModel(
+            total = entity?.total ?: 0f,
+            positive = entity?.positive?: 0f,
+            negative = entity?.negative?: 0f
         )
     }
 }

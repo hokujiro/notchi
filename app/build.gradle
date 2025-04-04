@@ -83,6 +83,9 @@ dependencies {
     implementation 'com.google.http-client:google-http-client-jackson2:1.42.3'
     implementation 'com.google.firebase:firebase-auth-ktx:23.2.0'
 
+    //Security refreshed tokens
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
 
     // OkHttp for logging (optional but useful for debugging)
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")

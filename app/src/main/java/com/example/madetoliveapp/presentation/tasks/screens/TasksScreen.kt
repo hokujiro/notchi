@@ -43,6 +43,8 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     val totalPoints by taskViewModel.totalPoints.collectAsState() // Make sure this exists!
     val taskFilter by taskViewModel.taskFilter.collectAsState() // Make sure this exists!
     val sortMode by taskViewModel.sortMode.collectAsState() // Make sure this exists!
+    val dailyPoints by taskViewModel.dailyPoints.collectAsState()
+
     var openCreateTaskDialog =
         remember { mutableStateOf(false) } // State to control dialog visibility
     var isFabExpanded by remember { mutableStateOf(false) }
@@ -96,26 +98,31 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
                 .padding(paddingValues)
         ) {
 
-        HeaderComponent(totalPoints, paddingValues, outerScrollState)
+            HeaderComponent(totalPoints, paddingValues, outerScrollState)
 
-        CalendarHeader(
-            modifier = Modifier.fillMaxWidth(),
-            selectedDate = selectedDate,
-            onDateSelected = { date ->
-                selectedDate = date
-                taskViewModel.getTasksForDay(date) // Fetch tasks for the selected date
-            }
-        )
+            CalendarHeader(
+                modifier = Modifier.fillMaxWidth(),
+                selectedDate = selectedDate,
+                onDateSelected = { date ->
+                    selectedDate = date
+                    taskViewModel.getTasksForDay(date) // Fetch tasks for the selected date
+                }
+            )
 
-        FiltersComponent(taskViewModel::setFilter, taskViewModel::toggleSortMode, sortMode)
+            FiltersComponent(
+                taskViewModel::setFilter,
+                taskViewModel::toggleSortMode,
+                sortMode,
+                dailyPoints,
+            )
 
-        TaskComponent(
-            tasks = tasks,
-            onTaskClick = taskViewModel::toggleTaskCompletion,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 500.dp)
-        )
+            TaskComponent(
+                tasks = tasks,
+                onTaskClick = taskViewModel::toggleTaskCompletion,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
+            )
 
         }
     }

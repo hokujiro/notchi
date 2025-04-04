@@ -1,7 +1,9 @@
 package com.example.madetoliveapp.data.repository
 
+import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
+import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
 import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.TaskModel
 
@@ -83,7 +85,14 @@ class TaskRepositoryImpl(
         }
     }
 
-
+    override suspend fun getPointsForDay(date: Long): DailyPointsSummaryModel {
+        val response = taskApi.getPointsForDay(date)
+        if (response.isSuccessful) {
+            return mapper.toModel(response.body())
+        } else {
+            throw Exception("Failed to load daily points: ${response.errorBody()?.string()}")
+        }
+    }
 
 
 }

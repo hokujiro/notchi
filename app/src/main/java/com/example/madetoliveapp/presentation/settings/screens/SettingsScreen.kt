@@ -41,7 +41,7 @@ fun SettingsScreen(
             ) {
                 Button(
                     onClick = {
-                        tokenManager.clearToken()
+                        tokenManager.clearTokens()
                         context.startActivity(Intent(context, AuthActivity::class.java))
                         if (context is Activity) context.finish()
                     },
