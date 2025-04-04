@@ -2,15 +2,72 @@
     <!-- Base application theme. -->
     <style name="Theme.Madetoliveapp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/earth_brown</item>
+        <item name="colorPrimaryVariant">@color/deep_brown</item>
+        <item name="colorOnPrimary">@color/cream</item>
+
+        <item name="colorSecondary">@color/moss_green</item>
+        <item name="colorSecondaryVariant">@color/forest_green</item>
+        <item name="colorOnSecondary">@color/cream</item>
+
+        <item name="android:colorBackground">@color/paper_beige</item>
+        <item name="colorOnBackground">@color/deep_brown</item>
+
+        <item name="colorSurface">@color/cream</item>
+        <item name="colorOnSurface">@color/earth_brown</item>
+
+        <!-- Typography -->
+        <item name="fontFamily">@font/cabin_sketch_regular</item> <!-- or any hand-drawn-like font -->
+        <item name="textAppearanceHeadline6">@style/CustomHeadline</item>
+        <item name="textAppearanceBody1">@style/CustomBody</item>
+
+        <!-- Shape + Elevation -->
+        <item name="shapeAppearanceSmallComponent">@style/RoundedShape</item>
+        <item name="shapeAppearanceMediumComponent">@style/RoundedShape</item>
+        <item name="shapeAppearanceLargeComponent">@style/RoundedShape</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/deep_brown</item>
+
+        <!-- Button styling -->
+        <item name="materialButtonStyle">@style/CottageButton</item>
+
+
+    </style>
+
+    <!-- Splash Theme -->
+    <style name="Theme.Madetoliveapp.Starting" parent="Theme.SplashScreen">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- Headline Text -->
+    <style name="CustomHeadline" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/deep_brown</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Body Text -->
+    <style name="CustomBody" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/earth_brown</item>
+    </style>
+
+    <!-- Rounded Corners -->
+    <style name="RoundedShape" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- Elevated Button -->
+    <style name="CottageButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/moss_green</item>
+        <item name="android:textColor">@color/cream</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <!-- Outlined/Text Button -->
+    <style name="CottageTextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/deep_brown</item>
     </style>
 </resources>

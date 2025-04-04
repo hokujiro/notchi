@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.presentation.components
+package com.example.madetoliveapp.presentation.tasks.components
 
 
 import androidx.compose.foundation.clickable
@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.extensions.CalendarDataSource
 import com.example.madetoliveapp.presentation.extensions.toLocalDate
@@ -99,7 +98,7 @@ fun Content(
     LazyRow(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
     ) {
         items(items = data.visibleDates) { day ->
             ContentItem(
@@ -118,7 +117,6 @@ fun ContentItem(
 ) {
     Card(
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 4.dp)
             .clickable { // making the element clickable, by adding 'clickable' modifier
                 onClickListener(date)
             },
@@ -132,8 +130,8 @@ fun ContentItem(
     ) {
         Column(
             modifier = Modifier
-                .width(42.dp)
-                .height(48.dp)
+                .width(48.dp)
+                .height(52.dp)
                 .padding(4.dp)
         ) {
             Text(
@@ -163,7 +161,8 @@ fun Header(
                 ),
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            style = MaterialTheme.typography.bodyLarge
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)

@@ -6,7 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.madetoliveapp.presentation.TaskViewModel
+import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.*
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
