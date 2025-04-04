@@ -20,8 +20,6 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // Optional content view (if you're not using Compose)
-
         lifecycleScope.launch {
             viewModel.navigationTarget.collect { target ->
                 when (target) {
