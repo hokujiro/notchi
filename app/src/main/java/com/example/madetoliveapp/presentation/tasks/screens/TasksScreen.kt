@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.tasks.components.AddTaskDialog
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
+import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
 import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
 import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingMenu
@@ -81,7 +82,7 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     ) { paddingValues ->
         val outerScrollState = rememberScrollState()
         if (openCreateTaskDialog.value) {
-            AddTaskDialog(
+            AddTaskBottomSheet(
                 onDismiss = { openCreateTaskDialog.value = false },
                 onAddTask = { newTask ->
                     taskViewModel.addTask(newTask)

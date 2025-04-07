@@ -2,6 +2,7 @@ package com.example.madetoliveapp.presentation.tasks.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,7 +62,7 @@ fun AddTaskDialog(
                     label = { Text("Subtitle") },
                     singleLine = true
                 )
-                DropdownMenuBox(
+                DropdownMenuBox2(
                     label = "Project",
                     options = projects.map { it.title },
                     selectedOption = selectedProject?.title?:"Title",
@@ -76,7 +77,7 @@ fun AddTaskDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
                 )
-                IconPicker(selectedIcon = selectedIcon, onIconSelected = { selectedIcon = it })
+                IconPicker2(selectedIcon = selectedIcon, onIconSelected = { selectedIcon = it })
             }
         },
         confirmButton = {
@@ -109,7 +110,7 @@ fun AddTaskDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuBox(
+fun DropdownMenuBox2(
     label: String,
     options: List<String>,
     selectedOption: String,
@@ -117,7 +118,7 @@ fun DropdownMenuBox(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded },) {
         OutlinedTextField(
             value = selectedOption,
             onValueChange = {},
@@ -141,7 +142,7 @@ fun DropdownMenuBox(
 }
 
 @Composable
-fun IconPicker(selectedIcon: String, onIconSelected: (String) -> Unit) {
+fun IconPicker2(selectedIcon: String, onIconSelected: (String) -> Unit) {
     val icons = listOf("✅", "📝", "📌", "🔥", "🚀", "🎯") // Add more as needed
     Column {
         Text("Icon", style = MaterialTheme.typography.labelLarge)
