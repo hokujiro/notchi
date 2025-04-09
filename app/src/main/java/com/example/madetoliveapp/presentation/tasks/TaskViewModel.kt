@@ -9,11 +9,13 @@ import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.usecase.AddProjectUseCase
 import com.example.madetoliveapp.domain.usecase.AddTaskUseCase
 import com.example.madetoliveapp.domain.usecase.DeleteTaskUseCase
+import com.example.madetoliveapp.domain.usecase.GetProjectByIdUseCase
 import com.example.madetoliveapp.domain.usecase.GetProjectsUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksForDayUseCase
 import com.example.madetoliveapp.domain.usecase.GetTasksUseCase
 import com.example.madetoliveapp.domain.usecase.GetUserPointsUseCase
 import com.example.madetoliveapp.domain.usecase.UpdateTaskUseCase
+import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,16 +32,20 @@ class TaskViewModel(
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val addProjectUseCase: AddProjectUseCase,
     private val getAllProjectsUseCase: GetProjectsUseCase,
-    private val getUserPointsUseCase: GetUserPointsUseCase
-)  : ViewModel() {
+    private val getUserPointsUseCase: GetUserPointsUseCase,
+    private val getProjectByIdUseCase: GetProjectByIdUseCase,
+) : ViewModel() {
 
     // Lista de tareas como StateFlow (mejor integración con Compose)
     private val _tasks = MutableStateFlow<List<TaskModel>>(emptyList())
     val tasks: StateFlow<List<TaskModel>> = _tasks.asStateFlow()
 
     // Lista de tareas como StateFlow (mejor integración con Compose)
-    private val _projects = MutableStateFlow<List<ProjectModel>>(emptyList())
-    val projects: StateFlow<List<ProjectModel>> = _projects.asStateFlow()
+    private val _projects = MutableStateFlow<List<ProjectUiModel>>(emptyList())
+    val projects: StateFlow<List<ProjectUiModel>> = _projects.asStateFlow()
+
+    private val _projectById = MutableStateFlow<ProjectUiModel>(ProjectUiModel())
+    val projectById: StateFlow<ProjectUiModel> = _projectById.asStateFlow()
 
     private val _totalPoints = MutableStateFlow(0)
     val totalPoints: StateFlow<Int> = _totalPoints
@@ -85,7 +91,8 @@ class TaskViewModel(
     }
 
     fun toggleSortMode() {
-        _sortMode.value = if (_sortMode.value == SortMode.BY_POINTS) SortMode.BY_CREATION else SortMode.BY_POINTS
+        _sortMode.value =
+            if (_sortMode.value == SortMode.BY_POINTS) SortMode.BY_CREATION else SortMode.BY_POINTS
     }
 
 
@@ -102,19 +109,20 @@ class TaskViewModel(
             }
         }
     }
-//testing new repo
-fun getAllTasks() {
-    viewModelScope.launch {
-        try {
-            val result = getAllTasksUseCase.execute()
-            _tasks.value = result
-        } catch (e: Exception) {
-            // Handle the error gracefully, log it, or update UI state
-            Log.e("TaskViewModel", "Error loading tasks", e)
-            // Optionally show error state to UI
+
+    //testing new repo
+    fun getAllTasks() {
+        viewModelScope.launch {
+            try {
+                val result = getAllTasksUseCase.execute()
+                _tasks.value = result
+            } catch (e: Exception) {
+                // Handle the error gracefully, log it, or update UI state
+                Log.e("TaskViewModel", "Error loading tasks", e)
+                // Optionally show error state to UI
+            }
         }
     }
-}
 
     fun getTasksForDay(date: Long) {
         viewModelScope.launch {
@@ -132,9 +140,16 @@ fun getAllTasks() {
     }
 
     // Add tasks using the use case
-    fun addProject(project: ProjectModel) {
+    fun addProject(project: ProjectUiModel) {
         viewModelScope.launch {
-            addProjectUseCase.execute(project)
+            addProjectUseCase.execute(
+                ProjectModel(
+                    uid = project.uid,
+                    title = project.title,
+                    tasksList = project.tasksList,
+                    color = project.color,
+                )
+            )
         }
         _projects.value += project
     }
@@ -143,12 +158,39 @@ fun getAllTasks() {
         viewModelScope.launch {
             try {
                 val result = getAllProjectsUseCase.execute()
-                _projects.value = result
+
+                val processedProjects: List<ProjectUiModel> = result.map { project ->
+                    val tasks = project.tasksList ?: emptyList()
+                    ProjectUiModel(
+                        uid = project.uid,
+                        title = project.title,
+                        tasksList = tasks,
+                        color = project.color,
+                        icon = project.icon,
+                        totalTasks = tasks.size,
+                        completedTasks = tasks.count { it.checked }
+                    )
+                }
+
+                _projects.value = processedProjects
             } catch (e: Exception) {
                 // Handle the error gracefully, log it, or update UI state
                 Log.e("TaskViewModel", "Error loading projects", e)
                 // Optionally show error state to UI
             }
+        }
+    }
+
+    fun getProjectById(projectId: String) {
+        viewModelScope.launch {
+           val result = getProjectByIdUseCase.execute(projectId)
+            _projectById.value = ProjectUiModel(
+                uid = result.uid,
+                title = result.title,
+                subtitle = result.subtitle,
+                tasksList = result.tasksList,
+                color = result.color
+            )
         }
     }
 

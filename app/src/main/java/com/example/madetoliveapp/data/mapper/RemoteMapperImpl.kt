@@ -21,7 +21,7 @@ class RemoteMapperImpl : RemoteMapper {
     ): TaskModel =
         with(entity) {
             TaskModel(
-                uid = uid,
+                uid = uid.toString(),
                 checked = checked,
                 title = title,
                 subTasks = toSubTasksModel(subTasks ?: emptyList()),
@@ -35,7 +35,6 @@ class RemoteMapperImpl : RemoteMapper {
     override fun toEntity(model: TaskModel): TaskEntity =
         with(model) {
             TaskEntity(
-                uid = uid,
                 checked = checked,
                 title = title,
                 subTasks = toSubTasksEntity(subTasks ?: emptyList()),
@@ -89,7 +88,7 @@ class RemoteMapperImpl : RemoteMapper {
 
     override fun toTaskDomainModel(entity: TaskEntity): TaskModel {
         return TaskModel(
-            uid = entity.uid,
+            uid = entity.uid.toString(),
             checked = entity.checked,
             title = entity.title,
             project = toTaskProjectDomainModel(entity.project),
@@ -101,8 +100,12 @@ class RemoteMapperImpl : RemoteMapper {
 
     override fun toProjectDomainModel(entity: ProjectEntity?): ProjectModel {
         return ProjectModel(
+            uid = entity?.uid.toString(),
             title = entity?.title ?: "",
-            color = entity?.color ?: ""
+            subtitle = entity?.subtitle ?: "",
+            tasksList = entity?.tasksList?.map { toTaskDomainModel(it) },
+            color = entity?.color ?: "",
+            icon = entity?.icon ?: ""
         )
     }
 
@@ -122,11 +125,10 @@ class RemoteMapperImpl : RemoteMapper {
 
     override fun toProjectEntity(project: ProjectModel): ProjectEntity {
         return ProjectEntity(
-            uid = project.uid,
             title = project.title,
+            subtitle = project.subtitle,
             tasksList = project.tasksList?.map {
                 TaskEntity(
-                    uid = it.uid,
                     checked = it.checked,
                     title = it.title,
                     subTasks = toSubTasksEntity(it.subTasks ?: emptyList()),
@@ -134,7 +136,8 @@ class RemoteMapperImpl : RemoteMapper {
                     points = it.points
                 )
             },
-            color = project.color
+            color = project.color,
+            icon = project.icon
         )
     }
 

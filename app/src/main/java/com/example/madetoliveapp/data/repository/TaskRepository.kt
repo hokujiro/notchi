@@ -14,4 +14,5 @@ interface TaskRepository {
     suspend fun addProject(project: ProjectModel) // Add a project
     suspend fun getAllProjects(): List<ProjectModel>
     suspend fun getPointsForDay(date: Long): DailyPointsSummaryModel
+    suspend fun getProjectById(projectId: String): ProjectModel
 }

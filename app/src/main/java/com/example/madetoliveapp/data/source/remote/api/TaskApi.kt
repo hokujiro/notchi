@@ -44,5 +44,11 @@ interface TaskApi {
     @POST("api/projects/add")
     suspend fun addProject(@Body project: ProjectEntity): Response<Unit>
 
+    @GET("api/projects/by-id")
+    suspend fun getProjectById(
+        @Query("id") id: Long
+    ): Response<ProjectEntity>
+
+
 
 }

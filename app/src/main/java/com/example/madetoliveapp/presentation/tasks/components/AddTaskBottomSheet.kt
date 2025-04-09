@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
+import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,7 @@ fun AddTaskBottomSheet(
     onDismiss: () -> Unit,
     onAddTask: (TaskModel) -> Unit,
     selectedDate: Long,
-    projects: List<ProjectModel> = listOf()
+    projects: List<ProjectUiModel> = listOf()
 ) {
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }

@@ -81,7 +81,7 @@ class TaskRepositoryImpl(
         if (response.isSuccessful) {
             return response.body()?.map { mapper.toProjectDomainModel(it) } ?: emptyList()
         } else {
-            throw Exception("Failed to load tasks: ${response.errorBody()?.string()}")
+            throw Exception("Failed to load projects: ${response.errorBody()?.string()}")
         }
     }
 
@@ -91,6 +91,15 @@ class TaskRepositoryImpl(
             return mapper.toModel(response.body())
         } else {
             throw Exception("Failed to load daily points: ${response.errorBody()?.string()}")
+        }
+    }
+
+    override suspend fun getProjectById(projectId: String): ProjectModel {
+        val response = taskApi.getProjectById(projectId.toLong())
+        if (response.isSuccessful) {
+            return mapper.toProjectDomainModel(response.body())
+        } else {
+            throw Exception("Failed to load project by id: ${response.errorBody()?.string()}")
         }
     }
 
