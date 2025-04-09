@@ -10,7 +10,7 @@ data class ProjectEntity (
     @PrimaryKey val uid: Long? = null,
     @ColumnInfo(name = "title") val title: String = "Title",
     @ColumnInfo(name = "subtitle") val subtitle: String = "Subtitle",
-    @ColumnInfo(name = "tasksList") val tasksList: List<TaskEntity>?,
+    @ColumnInfo(name = "tasks") val tasks: List<TaskEntity>?,
     @ColumnInfo(name = "color") val color: String?,
     @ColumnInfo(name = "icon") val icon: String?,
 )

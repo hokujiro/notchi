@@ -34,13 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.madetoliveapp.domain.model.TaskModel
+import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProjectDetailScreen(
     projectId: String,
-    viewModel: TaskViewModel = koinViewModel() // or hiltViewModel()
+    viewModel: ProjectViewModel = koinViewModel() // or hiltViewModel()
 ) {
     val project by viewModel.projectById.collectAsState()
 

@@ -13,7 +13,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface TaskApi {
-
     // Endpoint for tasks
     @GET("api/tasks/all")
     suspend fun getAllTasks(): Response<List<TaskEntity>>
@@ -36,19 +35,4 @@ interface TaskApi {
     suspend fun getPointsForDay(
         @Query("date") date: Long
     ): Response<DailyPointsSummaryEntity>
-
-    // Endpoint for projects
-    @GET("api/projects/all")
-    suspend fun getAllProjects(): Response<List<ProjectEntity>>
-
-    @POST("api/projects/add")
-    suspend fun addProject(@Body project: ProjectEntity): Response<Unit>
-
-    @GET("api/projects/by-id")
-    suspend fun getProjectById(
-        @Query("id") id: Long
-    ): Response<ProjectEntity>
-
-
-
 }

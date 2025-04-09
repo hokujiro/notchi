@@ -1,9 +1,8 @@
-package com.example.madetoliveapp.domain.usecase
+package com.example.madetoliveapp.domain.usecase.auth
 
-import com.example.madetoliveapp.data.repository.AuthRepository
+import com.example.madetoliveapp.data.repository.auth.AuthRepository
 import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthRequest
 import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthResponse
-import retrofit2.Response
 
 class GoogleAuthUseCase(
     private val authRepository: AuthRepository

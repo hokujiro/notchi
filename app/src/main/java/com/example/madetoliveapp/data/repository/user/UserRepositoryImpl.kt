@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.data.repository
+package com.example.madetoliveapp.data.repository.user
 
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.source.remote.api.UserApi

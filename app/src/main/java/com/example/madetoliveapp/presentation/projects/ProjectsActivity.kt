@@ -30,8 +30,8 @@ class ProjectsActivity : ComponentActivity() {
                         CreateProjectScreen(
                             onCancel = { navController.popBackStack() },
                             onSave = { project ->
-                                val taskViewModel: TaskViewModel = getViewModel()
-                                taskViewModel.addProject(project)
+                                val projectViewModel: ProjectViewModel = getViewModel()
+                                projectViewModel.addProject(project)
                                 navController.popBackStack()
                             }
                         )

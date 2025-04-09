@@ -103,7 +103,7 @@ class RemoteMapperImpl : RemoteMapper {
             uid = entity?.uid.toString(),
             title = entity?.title ?: "",
             subtitle = entity?.subtitle ?: "",
-            tasksList = entity?.tasksList?.map { toTaskDomainModel(it) },
+            tasksList = entity?.tasks?.map { toTaskDomainModel(it) },
             color = entity?.color ?: "",
             icon = entity?.icon ?: ""
         )
@@ -127,7 +127,7 @@ class RemoteMapperImpl : RemoteMapper {
         return ProjectEntity(
             title = project.title,
             subtitle = project.subtitle,
-            tasksList = project.tasksList?.map {
+            tasks = project.tasksList?.map {
                 TaskEntity(
                     checked = it.checked,
                     title = it.title,

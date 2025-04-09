@@ -1,6 +1,6 @@
-package com.example.madetoliveapp.domain.usecase
+package com.example.madetoliveapp.domain.usecase.auth
 
-import com.example.madetoliveapp.data.repository.AuthRepository
+import com.example.madetoliveapp.data.repository.auth.AuthRepository
 import com.example.madetoliveapp.data.source.remote.auth.TokenResponse
 
 class RefreshTokenUseCase(private val authRepository: AuthRepository) {

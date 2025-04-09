@@ -1,6 +1,5 @@
-package com.example.madetoliveapp.data.repository
+package com.example.madetoliveapp.data.repository.tasks
 
-import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
@@ -72,19 +71,6 @@ class TaskRepositoryImpl(
         taskApi.updateTask(task.uid, mapper.toEntity(task))
     }
 
-    override suspend fun addProject(project: ProjectModel) {
-        taskApi.addProject(mapper.toProjectEntity(project))
-    }
-
-    override suspend fun getAllProjects(): List<ProjectModel> {
-        val response = taskApi.getAllProjects()
-        if (response.isSuccessful) {
-            return response.body()?.map { mapper.toProjectDomainModel(it) } ?: emptyList()
-        } else {
-            throw Exception("Failed to load projects: ${response.errorBody()?.string()}")
-        }
-    }
-
     override suspend fun getPointsForDay(date: Long): DailyPointsSummaryModel {
         val response = taskApi.getPointsForDay(date)
         if (response.isSuccessful) {
@@ -93,15 +79,5 @@ class TaskRepositoryImpl(
             throw Exception("Failed to load daily points: ${response.errorBody()?.string()}")
         }
     }
-
-    override suspend fun getProjectById(projectId: String): ProjectModel {
-        val response = taskApi.getProjectById(projectId.toLong())
-        if (response.isSuccessful) {
-            return mapper.toProjectDomainModel(response.body())
-        } else {
-            throw Exception("Failed to load project by id: ${response.errorBody()?.string()}")
-        }
-    }
-
 
 }

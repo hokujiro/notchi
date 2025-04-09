@@ -5,13 +5,16 @@ import org.koin.dsl.module
 import androidx.room.Room
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.mapper.RemoteMapperImpl
-import com.example.madetoliveapp.data.repository.AuthRepository
-import com.example.madetoliveapp.data.repository.AuthRepositoryImpl
-import com.example.madetoliveapp.data.repository.TaskRepository
-import com.example.madetoliveapp.data.repository.TaskRepositoryImpl
-import com.example.madetoliveapp.data.repository.UserRepository
-import com.example.madetoliveapp.data.repository.UserRepositoryImpl
+import com.example.madetoliveapp.data.repository.auth.AuthRepository
+import com.example.madetoliveapp.data.repository.auth.AuthRepositoryImpl
+import com.example.madetoliveapp.data.repository.projects.ProjectRepository
+import com.example.madetoliveapp.data.repository.projects.ProjectRepositoryImpl
+import com.example.madetoliveapp.data.repository.tasks.TaskRepository
+import com.example.madetoliveapp.data.repository.tasks.TaskRepositoryImpl
+import com.example.madetoliveapp.data.repository.user.UserRepository
+import com.example.madetoliveapp.data.repository.user.UserRepositoryImpl
 import com.example.madetoliveapp.data.source.local.bbdd.AppDatabase
+import com.example.madetoliveapp.data.source.remote.api.ProjectApi
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.data.source.remote.api.UserApi
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
@@ -86,9 +89,11 @@ val dataModule = module {
     single<AuthApi> { get<Retrofit>(named("unauthenticatedRetrofit")).create(AuthApi::class.java) }
     single<TaskApi> { get<Retrofit>(named("authenticatedRetrofit")).create(TaskApi::class.java) }
     single<UserApi> { get<Retrofit>(named("authenticatedRetrofit")).create(UserApi::class.java) }
+    single<ProjectApi> { get<Retrofit>(named("authenticatedRetrofit")).create(ProjectApi::class.java) }
 
     // Repository
     single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
+    single<ProjectRepository> { ProjectRepositoryImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
     single<RemoteMapper> { RemoteMapperImpl() }

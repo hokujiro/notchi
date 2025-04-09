@@ -9,12 +9,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.madetoliveapp.data.source.remote.auth.AuthRequest
-import com.example.madetoliveapp.data.source.remote.auth.RefreshTokenRequest
 import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthRequest
-import com.example.madetoliveapp.domain.usecase.GoogleAuthUseCase
-import com.example.madetoliveapp.domain.usecase.LoginUseCase
-import com.example.madetoliveapp.domain.usecase.RefreshTokenUseCase
-import com.example.madetoliveapp.domain.usecase.RegisterUseCase
+import com.example.madetoliveapp.domain.usecase.auth.GoogleAuthUseCase
+import com.example.madetoliveapp.domain.usecase.auth.LoginUseCase
+import com.example.madetoliveapp.domain.usecase.auth.RefreshTokenUseCase
+import com.example.madetoliveapp.domain.usecase.auth.RegisterUseCase
 import com.example.madetoliveapp.presentation.rewards.RewardsActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

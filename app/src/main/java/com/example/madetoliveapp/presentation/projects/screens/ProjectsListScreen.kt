@@ -1,5 +1,6 @@
 package com.example.madetoliveapp.presentation.projects.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,28 +16,31 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
+import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
 
 
 @Composable
 fun ProjectsListScreen(
     navController: NavController,
-    taskViewModel: TaskViewModel = koinViewModel()
+    projectViewModel: ProjectViewModel = koinViewModel()
 ) {
-    val projects by taskViewModel.projects.collectAsState()
-
+    val projects by projectViewModel.projects.collectAsState()
 
     LaunchedEffect(Unit) {
-        taskViewModel.getAllProjects()
+        projectViewModel.getAllProjects()
     }
 
     Scaffold(
@@ -57,19 +61,65 @@ fun ProjectsListScreen(
             onTaskClick = { projectId ->
                 navController.navigate("project_detail/$projectId")
             },
-            modifier = Modifier.padding(paddingValues)
+            onDeleteProject = { project ->
+                projectViewModel.deleteProject(project)
+            },
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectsList(projects: List<ProjectUiModel>, onTaskClick: (String) -> Unit, modifier: Modifier = Modifier) {
+fun ProjectsList(
+    projects: List<ProjectUiModel>,
+    onTaskClick: (String) -> Unit,
+    onDeleteProject: (ProjectUiModel) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
-        modifier = modifier.padding(bottom = 56.dp)
-            .padding(WindowInsets.systemBars.asPaddingValues()) // Account for system bars
+        modifier = modifier
+            .padding(WindowInsets.systemBars.asPaddingValues()) // Optional, if you want system bar space
     ) {
-        items(projects) { project ->
-            ProjectItem(project, onTaskClick)
+        items(projects, key = { it.uid }) { project ->
+            val dismissState = rememberDismissState(
+                confirmValueChange = {
+                    if (it == DismissValue.DismissedToStart) {
+                        onDeleteProject(project)
+                        true
+                    } else false
+                }
+            )
+
+            SwipeToDismiss(
+                state = dismissState,
+                directions = setOf(DismissDirection.EndToStart), // Swipe right-to-left
+                background = {
+                    val color = when (dismissState.dismissDirection) {
+                        DismissDirection.EndToStart -> MaterialTheme.colorScheme.error
+                        else -> MaterialTheme.colorScheme.background
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = "Delete",
+                            color = MaterialTheme.colorScheme.onError,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                },
+                dismissContent = {
+                    ProjectItem(project, onTaskClick)
+                }
+            )
         }
     }
 }

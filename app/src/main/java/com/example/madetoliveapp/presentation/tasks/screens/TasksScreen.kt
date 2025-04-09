@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.tasks.components.AddTaskDialog
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
+import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
 import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
@@ -31,7 +32,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 @Composable
-fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
+fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel: ProjectViewModel = koinViewModel()) {
 
     var selectedDate by remember {
         mutableLongStateOf(
@@ -40,7 +41,7 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel()) {
     }
     // Obtener las tareas desde el ViewModel
     val tasks by taskViewModel.visibleTasks.collectAsState()
-    val projects by taskViewModel.projects.collectAsState()
+    val projects by projectViewModel.projects.collectAsState()
     val totalPoints by taskViewModel.totalPoints.collectAsState() // Make sure this exists!
     val taskFilter by taskViewModel.taskFilter.collectAsState() // Make sure this exists!
     val sortMode by taskViewModel.sortMode.collectAsState() // Make sure this exists!

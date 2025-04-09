@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.data.repository
+package com.example.madetoliveapp.data.repository.auth
 
 
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
@@ -8,7 +8,6 @@ import com.example.madetoliveapp.data.source.remote.auth.RefreshTokenRequest
 import com.example.madetoliveapp.data.source.remote.auth.TokenResponse
 import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthRequest
 import com.example.madetoliveapp.data.source.remote.googleauth.GoogleAuthResponse
-import retrofit2.Call
 import retrofit2.Response
 
 class AuthRepositoryImpl(
