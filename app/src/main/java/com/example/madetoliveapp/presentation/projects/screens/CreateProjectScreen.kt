@@ -1,8 +1,11 @@
 package com.example.madetoliveapp.presentation.projects.screens
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,11 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.madetoliveapp.domain.model.ProjectModel
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
 import com.example.madetoliveapp.presentation.tasks.components.IconPicker
+import androidx.emoji2.emojipicker.RecentEmojiProviderAdapter
+import com.example.madetoliveapp.presentation.extensions.CustomRecentEmojiProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +48,8 @@ fun CreateProjectScreen(
     var title by remember { mutableStateOf("") }
     var icon by remember { mutableStateOf("📁") }
     var tasks by remember { mutableStateOf(listOf<TaskModel>()) }
+    var selectedIcon by remember { mutableStateOf("✅") } // Default emoji
+    var showEmojiPicker by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -81,8 +89,21 @@ fun CreateProjectScreen(
                 label = { Text("Project Title") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Button(onClick = { showEmojiPicker = true }) {
+                Text(text = selectedIcon, fontSize = 24.sp)
+            }
 
-            IconPicker(selectedIcon = icon, onIconSelected = { icon = it })
+            if (showEmojiPicker) {
+                EmojiPicker(
+                    onDismiss = { showEmojiPicker = false },
+                    onConfirm = {
+                        selectedIcon = it
+                        showEmojiPicker = false
+                    }
+                )
+            }
+
+            //IconPicker(selectedIcon = icon, onIconSelected = { icon = it })
 
             Text("Tasks", style = MaterialTheme.typography.titleMedium)
 
@@ -134,3 +155,35 @@ fun TaskInputItem(
         }
     }
 }
+
+@Composable
+fun EmojiPicker(
+    onDismiss: () -> Unit = {},
+    onConfirm: (String) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        BackHandler {
+            onDismiss()
+        }
+        AndroidView(
+            factory = { context ->
+                androidx.emoji2.emojipicker.EmojiPickerView(context).apply {
+                    clipToOutline = true
+                    setRecentEmojiProvider(
+                        RecentEmojiProviderAdapter(CustomRecentEmojiProvider(context))
+                    )
+                    setOnEmojiPickedListener { emoji ->
+                        onDismiss()
+                        onConfirm(emoji.emoji)
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        )
+    }
+}
+
