@@ -1,6 +1,7 @@
 package com.example.madetoliveapp.data.repository.auth
 
 
+import android.util.Log
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
 import com.example.madetoliveapp.data.source.remote.auth.AuthRequest
 import com.example.madetoliveapp.data.source.remote.auth.AuthResponse
@@ -28,16 +29,8 @@ class AuthRepositoryImpl(
         return authApi.loginWithGoogle(authRequest)
     }
 
-    override suspend fun refreshToken(refreshToken: String): Result<TokenResponse> {
-        return try {
-            val response = authApi.refreshToken(RefreshTokenRequest(refreshToken))
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Failed to refresh token"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun refreshToken(refreshToken: String): Response<TokenResponse> {
+        Log.d("refreshToken", refreshToken)
+        return authApi.refreshToken(RefreshTokenRequest(refreshToken))
     }
 }

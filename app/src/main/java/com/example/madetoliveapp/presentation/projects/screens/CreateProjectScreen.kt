@@ -1,14 +1,18 @@
 package com.example.madetoliveapp.presentation.projects.screens
 
+
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -19,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -26,18 +31,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
-import com.example.madetoliveapp.presentation.tasks.components.IconPicker
 import androidx.emoji2.emojipicker.RecentEmojiProviderAdapter
 import com.example.madetoliveapp.presentation.extensions.CustomRecentEmojiProvider
+import kotlinx.coroutines.launch
+import androidx.compose.material3.TextFieldDefaults
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +58,11 @@ fun CreateProjectScreen(
     var icon by remember { mutableStateOf("📁") }
     var tasks by remember { mutableStateOf(listOf<TaskModel>()) }
     var selectedIcon by remember { mutableStateOf("✅") } // Default emoji
+    val coroutineScope = rememberCoroutineScope()
     var showEmojiPicker by remember { mutableStateOf(false) }
+    val sharedShape = RoundedCornerShape(20.dp)
+    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+
 
     Scaffold(
         topBar = {
@@ -67,7 +80,7 @@ fun CreateProjectScreen(
                                 title = title,
                                 color = "0xFF3B5F6B",
                                 tasksList = tasks,
-                                icon = icon
+                                icon = selectedIcon
                             )
                         onSave(newProject)
                     }) {
@@ -83,25 +96,71 @@ fun CreateProjectScreen(
             .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Project Title") },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
-            )
-            Button(onClick = { showEmojiPicker = true }) {
-                Text(text = selectedIcon, fontSize = 24.sp)
+            ) {
+                // Emoji Button styled like a field
+                Surface(
+                    shape = sharedShape,
+                    color = backgroundColor,
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch { showEmojiPicker = true }
+                            }
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = selectedIcon, fontSize = 24.sp)
+                    }
+                }
+
+                // Styled TextField with matching shape and background
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Project Title") },
+                    shape = sharedShape,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = backgroundColor,
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             if (showEmojiPicker) {
-                EmojiPicker(
-                    onDismiss = { showEmojiPicker = false },
-                    onConfirm = {
-                        selectedIcon = it
-                        showEmojiPicker = false
+                Dialog(onDismissRequest = {
+                    showEmojiPicker = false
+                }) {
+                    Surface(
+                        shape = RoundedCornerShape(32.dp),
+                        tonalElevation = 10.dp,
+                        modifier = Modifier
+                            .fillMaxWidth() // 👉 wider (95% of screen width)
+                            .heightIn(max = 500.dp)
+                            .padding(horizontal = 4.dp, vertical = 16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            EmojiPicker(
+                                onDismiss = { showEmojiPicker = false },
+                                onConfirm = { emoji ->
+                                    selectedIcon = emoji
+                                    showEmojiPicker = false
+                                }
+                            )
+                        }
                     }
-                )
+                }
             }
+
 
             //IconPicker(selectedIcon = icon, onIconSelected = { icon = it })
 
@@ -161,29 +220,26 @@ fun EmojiPicker(
     onDismiss: () -> Unit = {},
     onConfirm: (String) -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        BackHandler {
-            onDismiss()
-        }
-        AndroidView(
-            factory = { context ->
-                androidx.emoji2.emojipicker.EmojiPickerView(context).apply {
-                    clipToOutline = true
-                    setRecentEmojiProvider(
-                        RecentEmojiProviderAdapter(CustomRecentEmojiProvider(context))
-                    )
-                    setOnEmojiPickedListener { emoji ->
-                        onDismiss()
-                        onConfirm(emoji.emoji)
-                    }
+    BackHandler { onDismiss() }
+
+    AndroidView(
+        factory = { context ->
+            androidx.emoji2.emojipicker.EmojiPickerView(context).apply {
+                clipToOutline = true
+                isVerticalScrollBarEnabled = true
+                setRecentEmojiProvider(
+                    RecentEmojiProviderAdapter(CustomRecentEmojiProvider(context))
+                )
+                setOnEmojiPickedListener { emoji ->
+                    onDismiss()
+                    onConfirm(emoji.emoji)
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-        )
-    }
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 500.dp) // 👈 This is the key
+    )
 }
+
 

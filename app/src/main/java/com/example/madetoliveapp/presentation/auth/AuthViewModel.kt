@@ -100,24 +100,33 @@ class AuthViewModel(
         val accessToken = tokenManager.getAccessToken()
         val refreshToken = tokenManager.getRefreshToken()
 
-        if (!accessToken.isNullOrEmpty()) {
-            _navigationTarget.value = NavigationTarget.TASKS
-        } else if (!refreshToken.isNullOrEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val result = refreshTokenUseCase(refreshToken)
-                result.fold(
-                    onSuccess = {
-                        tokenManager.saveTokens(it.accessToken, it.refreshToken)
-                        _navigationTarget.emit(NavigationTarget.TASKS)
-                    },
-                    onFailure = {
-                        tokenManager.clearTokens()
-                        _navigationTarget.emit(NavigationTarget.AUTH)
-                    }
-                )
+        when {
+            !accessToken.isNullOrEmpty() -> {
+                _navigationTarget.value = NavigationTarget.TASKS
             }
-        } else {
-            _navigationTarget.value = NavigationTarget.AUTH
+
+            !refreshToken.isNullOrEmpty() -> {
+                viewModelScope.launch {
+                    try {
+                        val response = refreshTokenUseCase(refreshToken) // Now returns Response<TokenResponse>
+                        if (response.isSuccessful && response.body() != null) {
+                            val body = response.body()!!
+                            tokenManager.saveTokens(body.accessToken, body.refreshToken)
+                            _navigationTarget.value = NavigationTarget.TASKS
+                        } else {
+                            tokenManager.clearTokens()
+                            _navigationTarget.value = NavigationTarget.AUTH
+                        }
+                    } catch (e: Exception) {
+                        tokenManager.clearTokens()
+                        _navigationTarget.value = NavigationTarget.AUTH
+                    }
+                }
+            }
+
+            else -> {
+                _navigationTarget.value = NavigationTarget.AUTH
+            }
         }
     }
 

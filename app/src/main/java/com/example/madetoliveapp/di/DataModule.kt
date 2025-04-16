@@ -3,6 +3,7 @@ package com.example.madetoliveapp.di
 import android.util.Log
 import org.koin.dsl.module
 import androidx.room.Room
+import com.example.madetoliveapp.BuildConfig
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.mapper.RemoteMapperImpl
 import com.example.madetoliveapp.data.repository.auth.AuthRepository
@@ -35,16 +36,16 @@ val dataModule = module {
 
     single { TokenManager(androidContext()) }
 
-    // Room Database
     single {
         Room.databaseBuilder(get(), AppDatabase::class.java, "app_database")
             .fallbackToDestructiveMigration()
             .build()
     }
 
-    //http client
     single(named("unauthenticated")) {
-        val logging = HttpLoggingInterceptor()
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BASIC // or HEADERS
+        }
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
 
         OkHttpClient.Builder()
@@ -52,17 +53,16 @@ val dataModule = module {
             .build()
     }
 
-    //http client
     single(named("authenticated")) {
-        val logging = HttpLoggingInterceptor()
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val logging = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
+        }
         OkHttpClient.Builder()
-            .addInterceptor(logging)
-            .addInterceptor(TokenInterceptor(get(), get())) // ✅ Pass authApi
+            .addInterceptor(TokenInterceptor(get(), get())) // ✅ Token logic first
+            .addInterceptor(logging)                        // ✅ Logging last
             .build()
     }
 
-    // Retrofit without token (AuthApi)
     single(named("unauthenticatedRetrofit")) {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
@@ -72,7 +72,6 @@ val dataModule = module {
             .build()
     }
 
-// Retrofit with token (TaskApi)
     single(named("authenticatedRetrofit")) {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
@@ -131,15 +130,19 @@ class TokenInterceptor(
                         if (newTokens != null) {
                             tokenManager.saveTokens(newTokens.accessToken, newTokens.refreshToken)
 
-                            // Retry original request with new token
                             val newRequest = originalRequest.newBuilder()
                                 .removeHeader("Authorization")
                                 .addHeader("Authorization", "Bearer ${newTokens.accessToken}")
                                 .build()
 
-                            return chain.proceed(newRequest)
+                            val newResponse = chain.proceed(newRequest)
+
+                            // ✅ Buffer the body so Retrofit can read it
+                            val bufferedBody = newResponse.peekBody(Long.MAX_VALUE)
+                            return newResponse.newBuilder().body(bufferedBody).build()
                         }
                     }
+
                 } catch (e: Exception) {
                     Log.e("TokenInterceptor", "Token refresh failed: ${e.message}")
                 }

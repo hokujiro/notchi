@@ -11,5 +11,5 @@ interface AuthRepository {
     suspend fun login(authRequest: AuthRequest): Response<AuthResponse> // Fetch all tasks
     suspend fun register(authRequest: AuthRequest): Response<AuthResponse> // Fetch all tasks
     suspend fun googleSignIn(authRequest: GoogleAuthRequest): Response<GoogleAuthResponse>  // Fetch all tasks
-    suspend fun refreshToken(refreshToken: String): Result<TokenResponse>
+    suspend fun refreshToken(refreshToken: String): Response<TokenResponse>
 }
