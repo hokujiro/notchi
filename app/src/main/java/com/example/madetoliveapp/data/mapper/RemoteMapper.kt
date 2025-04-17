@@ -13,11 +13,7 @@ import com.example.madetoliveapp.domain.model.TaskProjectModel
 
 interface RemoteMapper {
 
-    fun toModel(
-        entity: TaskEntity
-    ): TaskModel
-
-    fun toEntity(
+    fun toTaskEntity(
         model: TaskModel
     ): TaskEntity
 
@@ -34,7 +30,7 @@ interface RemoteMapper {
     ): TaskModel
 
     fun toProjectDomainModel(
-        entity: ProjectEntity?
+        project: ProjectEntity?
     ): ProjectModel
 
     fun toProjectEntity(
@@ -45,6 +41,6 @@ interface RemoteMapper {
 
     fun toTaskProjectDomainModel(entity: TaskProjectEntity?): TaskProjectModel
 
-    fun toModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel
+    fun toDailyPointsSummaryModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel
 
 }

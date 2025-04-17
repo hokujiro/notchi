@@ -16,23 +16,7 @@ import java.util.Locale
 
 class RemoteMapperImpl : RemoteMapper {
 
-    override fun toModel(
-        entity: TaskEntity
-    ): TaskModel =
-        with(entity) {
-            TaskModel(
-                uid = uid.toString(),
-                checked = checked,
-                title = title,
-                subTasks = toSubTasksModel(subTasks ?: emptyList()),
-                project = toTaskProjectDomainModel(project),
-                date = stringToDate(date),
-                points = points
-
-            )
-        }
-
-    override fun toEntity(model: TaskModel): TaskEntity =
+    override fun toTaskEntity(model: TaskModel): TaskEntity =
         with(model) {
             TaskEntity(
                 checked = checked,
@@ -98,28 +82,32 @@ class RemoteMapperImpl : RemoteMapper {
         )
     }
 
-    override fun toProjectDomainModel(entity: ProjectEntity?): ProjectModel {
+    override fun toProjectDomainModel(project: ProjectEntity?): ProjectModel {
         return ProjectModel(
-            uid = entity?.uid.toString(),
-            title = entity?.title ?: "",
-            subtitle = entity?.subtitle ?: "",
-            tasksList = entity?.tasks?.map { toTaskDomainModel(it) },
-            color = entity?.color ?: "",
-            icon = entity?.icon ?: ""
+            uid = project?.uid.toString(),
+            title = project?.title ?: "",
+            subtitle = project?.subtitle ?: "",
+            tasksList = project?.tasks?.map { toTaskDomainModel(it) },
+            color = project?.color ?: "",
+            icon = project?.icon ?: ""
         )
     }
 
     override fun toTaskProjectDomainModel(entity: TaskProjectEntity?): TaskProjectModel {
         return TaskProjectModel(
+            id = entity?.id ?: "",
             title = entity?.title ?: "",
-            color = entity?.color ?: ""
+            color = entity?.color ?: "",
+            icon = entity?.icon ?: ""
         )
     }
 
     override fun toTaskProjectEntity(project: TaskProjectModel?): TaskProjectEntity {
         return TaskProjectEntity(
+            id = project?.id ?: "",
             title = project?.title ?: "",
-            color = project?.color ?: ""
+            color = project?.color ?: "",
+            icon = project?.icon ?: ""
         )
     }
 
@@ -141,7 +129,7 @@ class RemoteMapperImpl : RemoteMapper {
         )
     }
 
-    override fun toModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel {
+    override fun toDailyPointsSummaryModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel {
         return DailyPointsSummaryModel(
             total = entity?.total ?: 0f,
             positive = entity?.positive?: 0f,

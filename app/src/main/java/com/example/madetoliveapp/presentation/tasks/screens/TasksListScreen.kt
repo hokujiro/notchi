@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
-import com.example.madetoliveapp.presentation.tasks.components.AddTaskDialog
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet

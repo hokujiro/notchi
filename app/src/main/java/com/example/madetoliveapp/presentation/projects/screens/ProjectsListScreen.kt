@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
@@ -131,6 +133,9 @@ fun ProjectItem(project: ProjectUiModel, onProjectClick: (String) -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
             .clickable { onProjectClick(project.uid) },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Column(
             modifier = Modifier
@@ -138,10 +143,9 @@ fun ProjectItem(project: ProjectUiModel, onProjectClick: (String) -> Unit) {
                 .fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Folder, // You can use another icon if you'd like
-                    contentDescription = "Project Icon",
-                    tint = MaterialTheme.colorScheme.primary
+                Text(
+                    text = project.icon,
+                    fontSize = 24.sp
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(

@@ -45,6 +45,7 @@ class ProjectViewModel(
                     title = project.title,
                     tasksList = project.tasksList,
                     color = project.color,
+                    icon = project.icon
                 )
             )
         }
@@ -86,7 +87,8 @@ class ProjectViewModel(
                 title = result.title,
                 subtitle = result.subtitle,
                 tasksList = result.tasksList,
-                color = result.color
+                color = result.color,
+                icon = result.icon
             )
         }
     }

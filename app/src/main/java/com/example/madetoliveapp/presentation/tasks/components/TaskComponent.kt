@@ -2,6 +2,7 @@ package com.example.madetoliveapp.presentation.tasks.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -34,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.theme.DeepBrown
 import com.example.madetoliveapp.presentation.theme.EarthBrown
@@ -57,10 +59,12 @@ fun TaskComponent(
 
 @Composable
 fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
-    val backgroundColor = if (task.checked) Color(0xFFECE0D1) else Color(0xFFFFF8E1) // Soft browns/beige
+    val backgroundColor =
+        if (task.checked) Color(0xFFECE0D1) else Color(0xFFFFF8E1) // Soft browns/beige
     val pointsCircleColor = if (task.checked) DeepBrown else EarthBrown // Light khaki
     val textColor = MaterialTheme.colorScheme.onSurface
-    val pointsTextColor = if (task.checked) Color(0xFF388E3C) else MaterialTheme.colorScheme.onSurface
+    val pointsTextColor =
+        if (task.checked) Color(0xFF388E3C) else MaterialTheme.colorScheme.onSurface
 
     Card(
         modifier = Modifier
@@ -71,41 +75,57 @@ fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(6.dp)
         ) {
-            Checkbox(
-                checked = task.checked,
-                onCheckedChange = { onTaskClick(task.uid) },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    uncheckedColor = MaterialTheme.colorScheme.primary,
-                    checkmarkColor = Color.White
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularCheckbox(
+                    checked = task.checked,
+                    onCheckedChange = { onTaskClick(task.uid) }
                 )
-            )
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textDecoration = if (task.checked) TextDecoration.LineThrough else null,
-                        color = textColor
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            textDecoration = if (task.checked) TextDecoration.LineThrough else null,
+                            color = textColor
+                        )
                     )
-                )
-            }
+                    if (task.project.icon != "") {
+                        task.project.let { project ->
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = project.icon,
+                                    fontSize = 18.sp // slightly smaller than title
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = project.title,
+                                    fontSize = 14.sp // slightly smaller than title
+                                )
+                            }
 
-            // Points Badge
+                        }
+                    }
+                }
+
+                // Points Badge
                 Text(
                     text = "${task.points} ⭐ ",
                     style = MaterialTheme.typography.labelLarge.copy(
                         color = pointsTextColor
                     )
                 )
+            }
         }
     }
 }

@@ -185,7 +185,7 @@ fun CreateProjectScreen(
                         checked = false,
                         date = null,
                         points = 10,
-                                project = TaskProjectModel()
+                        project = TaskProjectModel()
                     )
                 },
                 modifier = Modifier.fillMaxWidth()

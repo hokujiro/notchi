@@ -3,7 +3,6 @@ package com.example.madetoliveapp.data.repository.tasks
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
-import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.TaskModel
 
 class TaskRepositoryImpl(
@@ -48,7 +47,7 @@ class TaskRepositoryImpl(
         */
 
     override suspend fun insertTask(task: TaskModel) {
-        taskApi.insertTask(mapper.toEntity(task))
+        taskApi.insertTask(mapper.toTaskEntity(task))
     }
 
     /*
@@ -68,13 +67,13 @@ class TaskRepositoryImpl(
         }*/
 
     override suspend fun updateTask(task: TaskModel) {
-        taskApi.updateTask(task.uid, mapper.toEntity(task))
+        taskApi.updateTask(task.uid, mapper.toTaskEntity(task))
     }
 
     override suspend fun getPointsForDay(date: Long): DailyPointsSummaryModel {
         val response = taskApi.getPointsForDay(date)
         if (response.isSuccessful) {
-            return mapper.toModel(response.body())
+            return mapper.toDailyPointsSummaryModel(response.body())
         } else {
             throw Exception("Failed to load daily points: ${response.errorBody()?.string()}")
         }

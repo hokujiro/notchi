@@ -1,6 +1,7 @@
 package com.example.madetoliveapp.presentation.projects.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,17 +9,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,35 +36,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
+import androidx.compose.ui.unit.sp
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
+import com.example.madetoliveapp.presentation.projects.components.AddProjectTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
+import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
+import com.example.madetoliveapp.presentation.theme.DeepBrown
+import com.example.madetoliveapp.presentation.theme.EarthBrown
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProjectDetailScreen(
     projectId: String,
-    viewModel: ProjectViewModel = koinViewModel() // or hiltViewModel()
+    projectViewModel: ProjectViewModel = koinViewModel(),
+    taskViewModel: TaskViewModel = koinViewModel() // or hiltViewModel()
 ) {
-    val project by viewModel.projectById.collectAsState()
+    val project by projectViewModel.projectById.collectAsState()
+    val taskList by taskViewModel.tasks.collectAsState()
+    val filteredTasks = taskList.filter { it.project.id == projectId }
+
+    var openCreateTaskDialog =
+        remember { mutableStateOf(false) } // State to control dialog visibility
 
     LaunchedEffect(Unit) {
-        viewModel.getProjectById(projectId)
+        projectViewModel.getProjectById(projectId)
     }
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+    LaunchedEffect(Unit) {
+        taskViewModel.getAllTasks()
+    }
 
-    val color = try {
-        Color(android.graphics.Color.parseColor(project.color))
-    } catch (e: Exception) {
-        MaterialTheme.colorScheme.primary
+    if (openCreateTaskDialog.value) {
+        AddProjectTaskBottomSheet(
+            onDismiss = { openCreateTaskDialog.value = false },
+            onAddTask = { newTask ->
+                taskViewModel.addTask(newTask)
+                openCreateTaskDialog.value = false
+            },
+            project = projectId
+        )
     }
 
     Column(
@@ -68,31 +86,17 @@ fun ProjectDetailScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        // Colored banner
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    color
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Folder, // or use project!!.icon if custom
-                contentDescription = "Project Icon",
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(48.dp)
+        Row {
+            Text(
+                text = project.icon,
+                fontSize = 24.sp
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = project.title,
+                style = MaterialTheme.typography.headlineSmall
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = project.title ?: "Title UI",
-            style = MaterialTheme.typography.headlineSmall
-        )
 
         Text(
             text = project.subtitle ?: "",
@@ -102,38 +106,91 @@ fun ProjectDetailScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Tasks",
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Tasks",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.weight(1f)) // Pushes the IconButton to the end
+            IconButton(onClick = { openCreateTaskDialog.value = true }) {
+                Icon(
+                    imageVector = Icons.Default.Add, // or any other icon
+                    contentDescription = "Add Task"
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn {
-            project.tasksList?.let { taskList ->
-                items(taskList) { task ->
-                    TaskItem(task = task)
-                }
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(max = 500.dp)
+        ) {
+            items(filteredTasks) { task ->
+                TaskItem(task, onTaskClick = taskViewModel::toggleTaskCompletion)
             }
         }
     }
 }
 
 @Composable
-fun TaskItem(task: TaskModel) {
-    Row(
+fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
+    val backgroundColor =
+        if (task.checked) Color(0xFFECE0D1) else Color(0xFFFFF8E1) // Soft browns/beige
+    val textColor = MaterialTheme.colorScheme.onSurface
+    val pointsTextColor =
+        if (task.checked) Color(0xFF388E3C) else MaterialTheme.colorScheme.onSurface
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                onTaskClick(task.uid)
+            },
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
-        Checkbox(
-            checked = task.checked,
-            onCheckedChange = null // Read-only in detail
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = task.title,
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = task.checked,
+                onCheckedChange = { onTaskClick(task.uid) },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.primary,
+                    checkmarkColor = Color.White
+                )
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = task.title,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        textDecoration = if (task.checked) TextDecoration.LineThrough else null,
+                        color = textColor
+                    )
+                )
+            }
+
+            // Points Badge
+            Text(
+                text = "${task.points} ⭐ ",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    color = pointsTextColor
+                )
+            )
+        }
     }
 }
