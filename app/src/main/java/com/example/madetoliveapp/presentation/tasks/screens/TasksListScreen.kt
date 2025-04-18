@@ -20,12 +20,13 @@ import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
+import com.example.madetoliveapp.presentation.tasks.components.AddFailBottomSheet
 import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
-import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
 import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingMenu
 import com.example.madetoliveapp.presentation.tasks.components.FiltersComponent
 import com.example.madetoliveapp.presentation.tasks.components.HeaderComponent
+import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.ZoneId
@@ -46,8 +47,7 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
     val sortMode by taskViewModel.sortMode.collectAsState() // Make sure this exists!
     val dailyPoints by taskViewModel.dailyPoints.collectAsState()
 
-    var openCreateTaskDialog =
-        remember { mutableStateOf(false) } // State to control dialog visibility
+    var currentSheet by remember { mutableStateOf(SheetType.NONE) }
     var isFabExpanded by remember { mutableStateOf(false) }
 
 
@@ -66,31 +66,43 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
                 onToggle = { isFabExpanded = !isFabExpanded },
                 onActionClick = { index ->
                     isFabExpanded = false
-                    when (index) {
-                        0 -> {
-                            openCreateTaskDialog.value = true
-                        } // Add Task
-                        1 -> {/* handle add project */
-                        }
-
-                        2 -> {/* handle add habit */
-                        }
+                    currentSheet = when (index) {
+                        0 -> SheetType.ADD_TASK
+                        1 -> SheetType.ADD_FAIL
+                        else -> SheetType.NONE
                     }
                 }
             )
         }
     ) { paddingValues ->
         val outerScrollState = rememberScrollState()
-        if (openCreateTaskDialog.value) {
-            AddTaskBottomSheet(
-                onDismiss = { openCreateTaskDialog.value = false },
-                onAddTask = { newTask ->
-                    taskViewModel.addTask(newTask)
-                    openCreateTaskDialog.value = false
-                },
-                selectedDate = selectedDate,
-                projects = projects
-            )
+
+        when (currentSheet) {
+            SheetType.ADD_TASK -> {
+                AddTaskBottomSheet(
+                    onDismiss = { currentSheet = SheetType.NONE },
+                    onAddTask = {
+                        taskViewModel.addTask(it)
+                        currentSheet = SheetType.NONE
+                    },
+                    selectedDate = selectedDate,
+                    projects = projects
+                )
+            }
+
+            SheetType.ADD_FAIL -> {
+                AddFailBottomSheet(
+                    onDismiss = { currentSheet = SheetType.NONE },
+                    onAddTask = {
+                        taskViewModel.addTask(it)
+                        currentSheet = SheetType.NONE
+                    },
+                    selectedDate = selectedDate,
+                    projects = projects
+                )
+            }
+
+            SheetType.NONE -> {}
         }
 
         Column(
@@ -129,7 +141,5 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
     }
 }
 
-
-
-
+enum class SheetType { ADD_TASK, ADD_FAIL, NONE }
 

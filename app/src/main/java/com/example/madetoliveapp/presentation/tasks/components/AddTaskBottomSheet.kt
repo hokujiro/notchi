@@ -24,14 +24,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +57,7 @@ fun AddTaskBottomSheet(
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }
     var selectedProject by remember { mutableStateOf(projects.firstOrNull()) }
-    var points by remember { mutableStateOf("") }
+    var points by remember { mutableFloatStateOf(0f) }
     var selectedIcon by remember { mutableStateOf("✅") }
 
     ModalBottomSheet(
@@ -74,22 +79,27 @@ fun AddTaskBottomSheet(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                value = subtitle,
-                onValueChange = { subtitle = it },
-                label = { Text("Subtitle") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = points,
-                onValueChange = { points = it.filter { c -> c.isDigit() } },
-                label = { Text("Points") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            IconPicker(selectedIcon = selectedIcon, onIconSelected = { selectedIcon = it })
+            Column {
+                Slider(
+                    value = points,
+                    onValueChange = { points = it },
+                    valueRange = 0f..100f,
+                    steps = 9, // 10 main stops = 9 in-between steps
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(32.dp), // Make it thicker
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.secondary,
+                        activeTrackColor = MaterialTheme.colorScheme.secondary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.secondary
+                    )
+                )
+                Text(
+                    text = "Selected: ${points.toInt()} points",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -103,14 +113,15 @@ fun AddTaskBottomSheet(
                             checked = false,
                             subTasks = listOf(),
                             date = parsedDate,
-                            points = points.toIntOrNull(),
-                            project = TaskProjectModel()
+                            points = points.toInt(),
+                            project = null
                         )
                         onAddTask(newTask)
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Agregar")
+                    Text("Agregar",
+                        color =  MaterialTheme.colorScheme.background)
                 }
                 OutlinedButton(
                     onClick = onDismiss,
@@ -123,25 +134,5 @@ fun AddTaskBottomSheet(
     }
 
 
-}
-
-@Composable
-fun IconPicker(selectedIcon: String, onIconSelected: (String) -> Unit) {
-    val icons = listOf("✅", "📝", "📌", "🔥", "🚀", "🎯") // Add more as needed
-    Column {
-        Text("Icon", style = MaterialTheme.typography.labelLarge)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(icons) { icon ->
-                Button(
-                    onClick = { onIconSelected(icon) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (icon == selectedIcon) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Text(icon, fontSize = 20.sp)
-                }
-            }
-        }
-    }
 }
 

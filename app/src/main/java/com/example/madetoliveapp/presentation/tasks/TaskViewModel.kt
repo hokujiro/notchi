@@ -52,16 +52,18 @@ class TaskViewModel(
             TaskFilter.NEGATIVE -> allTasks.filter { (it.points ?: 0) < 0 }
         }
 
-        val sorted = filtered.sortedWith(
-            when (sort) {
-                SortMode.BY_POINTS -> compareBy<TaskModel> { it.checked }
+        val sorted = when (sort) {
+            SortMode.BY_POINTS -> filtered.sortedWith(
+                compareByDescending<TaskModel> { (it.points ?: 0) >= 0 } // Positive first
+                    .thenBy { it.checked }
                     .thenByDescending { it.points ?: 0 }
-
-                SortMode.BY_CREATION -> compareBy<TaskModel> { it.checked }
+            )
+            SortMode.BY_CREATION -> filtered.sortedWith(
+                compareByDescending<TaskModel> { (it.points ?: 0) >= 0 } // Positive first
+                    .thenBy { it.checked }
                     .thenBy { it.date }
-            }
-        )
-
+            )
+        }
         sorted
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 

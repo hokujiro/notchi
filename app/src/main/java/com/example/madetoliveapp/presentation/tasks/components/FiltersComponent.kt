@@ -18,9 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.madetoliveapp.presentation.tasks.SortMode
 import com.example.madetoliveapp.presentation.tasks.TaskFilter
+import com.example.madetoliveapp.presentation.theme.DarkText
 
 @Composable
 fun FiltersComponent(
@@ -36,10 +40,15 @@ fun FiltersComponent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // LEFT: Points
+        val emphasizedPointsStyle = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = DarkText // warm fail red
+            )
+
         Text(
             text = "$dailyPoints ⭐",
-            style = MaterialTheme.typography.bodyMedium
+            style = emphasizedPointsStyle
         )
 
         // RIGHT: Filter buttons

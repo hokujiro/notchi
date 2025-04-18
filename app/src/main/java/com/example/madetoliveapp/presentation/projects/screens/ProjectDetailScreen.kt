@@ -43,9 +43,6 @@ import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.projects.components.AddProjectTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
-import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
-import com.example.madetoliveapp.presentation.theme.DeepBrown
-import com.example.madetoliveapp.presentation.theme.EarthBrown
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -56,7 +53,7 @@ fun ProjectDetailScreen(
 ) {
     val project by projectViewModel.projectById.collectAsState()
     val taskList by taskViewModel.tasks.collectAsState()
-    val filteredTasks = taskList.filter { it.project.id == projectId }
+    val filteredTasks = taskList.filter { it.project?.id == projectId }
 
     var openCreateTaskDialog =
         remember { mutableStateOf(false) } // State to control dialog visibility

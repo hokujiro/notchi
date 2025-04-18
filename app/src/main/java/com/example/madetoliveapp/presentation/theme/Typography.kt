@@ -16,17 +16,17 @@ val CottageTypography = Typography(
     headlineMedium = TextStyle(
         fontFamily = CabinSketch,
         fontSize = 24.sp,
-        color = DeepBrown
+        color = DarkText
     ),
     bodyLarge = TextStyle(
         fontFamily = CabinSketch,
         fontSize = 16.sp,
-        color = EarthBrown
+        color = DarkText
     ),
     labelLarge = TextStyle(
         fontFamily = CabinSketch,
         fontSize = 14.sp,
-        color = DeepBrown
+        color = DarkText
     )
     // Add more styles as needed
 )

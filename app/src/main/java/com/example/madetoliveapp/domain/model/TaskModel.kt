@@ -7,7 +7,7 @@ data class TaskModel (
     val checked: Boolean,
     val title: String = "Title",
     val subTasks: List<SubTaskModel>? = listOf(),
-    val project: TaskProjectModel,
+    val project: TaskProjectModel?,
     val date: Date?,
     val points: Int?
 )
