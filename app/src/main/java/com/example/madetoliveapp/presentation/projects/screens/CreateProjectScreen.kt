@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -46,6 +48,8 @@ import androidx.emoji2.emojipicker.RecentEmojiProviderAdapter
 import com.example.madetoliveapp.presentation.extensions.CustomRecentEmojiProvider
 import kotlinx.coroutines.launch
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,17 +123,16 @@ fun CreateProjectScreen(
                     }
                 }
 
-                // Styled TextField with matching shape and background
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Project Title") },
-                    shape = sharedShape,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = backgroundColor,
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text("Project Title") },
+                        shape = sharedShape,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = backgroundColor,
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
             }
 
             if (showEmojiPicker) {

@@ -2,11 +2,13 @@ package com.example.madetoliveapp.presentation.tasks.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -24,12 +26,18 @@ fun CircularCheckbox(
     size: Dp = 20.dp,
     borderColor: Color = MaterialTheme.colorScheme.primary,
     fillColor: Color = MaterialTheme.colorScheme.primary,
-    checkmarkColor: Color = Color.White
+    checkmarkColor: Color = Color.White,
+    useCross: Boolean = false
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .size(size)
-            .clickable { onCheckedChange() },
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null, // 👈 disables ripple and visual "pressed" state
+                onClick = { onCheckedChange() }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -46,21 +54,39 @@ fun CircularCheckbox(
                     radius = size.toPx() / 2f
                 )
 
-                // Optional checkmark (drawn as a simple ✓)
-                drawLine(
-                    color = checkmarkColor,
-                    start = Offset(x = size.toPx() * 0.3f, y = size.toPx() * 0.5f),
-                    end = Offset(x = size.toPx() * 0.45f, y = size.toPx() * 0.65f),
-                    strokeWidth = 2.dp.toPx(),
-                    cap = StrokeCap.Round
-                )
-                drawLine(
-                    color = checkmarkColor,
-                    start = Offset(x = size.toPx() * 0.45f, y = size.toPx() * 0.65f),
-                    end = Offset(x = size.toPx() * 0.75f, y = size.toPx() * 0.35f),
-                    strokeWidth = 2.dp.toPx(),
-                    cap = StrokeCap.Round
-                )
+                if (useCross) {
+                    // Draw cross (X)
+                    drawLine(
+                        color = checkmarkColor,
+                        start = Offset(x = size.toPx() * 0.3f, y = size.toPx() * 0.3f),
+                        end = Offset(x = size.toPx() * 0.7f, y = size.toPx() * 0.7f),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                    drawLine(
+                        color = checkmarkColor,
+                        start = Offset(x = size.toPx() * 0.7f, y = size.toPx() * 0.3f),
+                        end = Offset(x = size.toPx() * 0.3f, y = size.toPx() * 0.7f),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                } else {
+                    // Draw checkmark (✓)
+                    drawLine(
+                        color = checkmarkColor,
+                        start = Offset(x = size.toPx() * 0.3f, y = size.toPx() * 0.5f),
+                        end = Offset(x = size.toPx() * 0.45f, y = size.toPx() * 0.65f),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                    drawLine(
+                        color = checkmarkColor,
+                        start = Offset(x = size.toPx() * 0.45f, y = size.toPx() * 0.65f),
+                        end = Offset(x = size.toPx() * 0.75f, y = size.toPx() * 0.35f),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                }
             }
         }
     }

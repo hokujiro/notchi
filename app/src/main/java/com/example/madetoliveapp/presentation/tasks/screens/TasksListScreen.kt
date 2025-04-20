@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
@@ -27,6 +28,7 @@ import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingM
 import com.example.madetoliveapp.presentation.tasks.components.FiltersComponent
 import com.example.madetoliveapp.presentation.tasks.components.HeaderComponent
 import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
+import com.example.madetoliveapp.presentation.tasks.components.TaskEditBottomSheet
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.ZoneId
@@ -39,13 +41,15 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
             LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         )
     }
-    // Obtener las tareas desde el ViewModel
     val tasks by taskViewModel.visibleTasks.collectAsState()
     val projects by projectViewModel.projects.collectAsState()
     val totalPoints by taskViewModel.totalPoints.collectAsState() // Make sure this exists!
     val taskFilter by taskViewModel.taskFilter.collectAsState() // Make sure this exists!
     val sortMode by taskViewModel.sortMode.collectAsState() // Make sure this exists!
     val dailyPoints by taskViewModel.dailyPoints.collectAsState()
+
+    var taskToEdit by remember { mutableStateOf<TaskModel?>(null) }
+
 
     var currentSheet by remember { mutableStateOf(SheetType.NONE) }
     var isFabExpanded by remember { mutableStateOf(false) }
@@ -56,6 +60,9 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
     }
     LaunchedEffect(Unit) {
         taskViewModel.loadUserPoints()
+    }
+    LaunchedEffect(Unit) {
+        projectViewModel.getAllProjects()
     }
 
     Scaffold(
@@ -102,6 +109,24 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
                 )
             }
 
+            SheetType.EDIT_TASK -> {
+                taskToEdit?.let { task ->
+                    TaskEditBottomSheet(
+                        task = task,
+                        projects = projects,
+                        onDismiss = {
+                            currentSheet = SheetType.NONE
+                            taskToEdit = null
+                        },
+                        onSave = {
+                            taskViewModel.updateTask(it)
+                            currentSheet = SheetType.NONE
+                            taskToEdit = null
+                        }
+                    )
+                }
+            }
+
             SheetType.NONE -> {}
         }
 
@@ -131,7 +156,12 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
 
             TaskComponent(
                 tasks = tasks,
-                onTaskClick = taskViewModel::toggleTaskCompletion,
+                onCheckClick = taskViewModel::toggleTaskCompletion,
+                onDeleteTask = taskViewModel::deleteTask,
+                onTaskClick = {
+                    taskToEdit = it
+                    currentSheet = SheetType.EDIT_TASK
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 500.dp)
@@ -141,5 +171,5 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
     }
 }
 
-enum class SheetType { ADD_TASK, ADD_FAIL, NONE }
+enum class SheetType { ADD_TASK, ADD_FAIL, EDIT_TASK, NONE }
 

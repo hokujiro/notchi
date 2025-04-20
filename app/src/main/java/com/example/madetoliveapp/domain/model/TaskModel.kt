@@ -1,9 +1,10 @@
 package com.example.madetoliveapp.domain.model
 
 import java.util.Date
+import java.util.UUID
 
 data class TaskModel (
-    val uid: String = "",
+    val uid: String = UUID.randomUUID().toString(),
     val checked: Boolean,
     val title: String = "Title",
     val subTasks: List<SubTaskModel>? = listOf(),

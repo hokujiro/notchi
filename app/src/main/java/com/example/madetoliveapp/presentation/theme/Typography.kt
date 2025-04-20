@@ -18,6 +18,11 @@ val CottageTypography = Typography(
         fontSize = 24.sp,
         color = DarkText
     ),
+    headlineSmall = TextStyle(
+        fontFamily = CabinSketch,
+        fontSize = 20.sp,
+        color = DarkText
+    ),
     bodyLarge = TextStyle(
         fontFamily = CabinSketch,
         fontSize = 16.sp,
@@ -27,6 +32,22 @@ val CottageTypography = Typography(
         fontFamily = CabinSketch,
         fontSize = 14.sp,
         color = DarkText
-    )
+    ),
+    titleLarge = TextStyle(
+        fontFamily = CabinSketch,
+        fontSize = 22.sp,
+        color = DarkText
+    ),
+    labelMedium = TextStyle(
+        fontFamily = CabinSketch,
+        fontSize = 14.sp,
+        color = DarkText,
+        fontWeight = FontWeight.Bold
+    ),
+    bodySmall = TextStyle(
+        fontFamily = CabinSketch,
+        fontSize = 12.sp,
+        color = DarkText
+    ),
     // Add more styles as needed
 )

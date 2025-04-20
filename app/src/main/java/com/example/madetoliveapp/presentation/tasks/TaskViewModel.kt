@@ -93,11 +93,23 @@ class TaskViewModel(
             val taskToUpdate = _tasks.value.find { it.uid == taskId }
             taskToUpdate?.let { task ->
                 val updatedTask = task.copy(checked = !task.checked)
-                updateTaskUseCase.execute(updatedTask) // Update task in the database
-                // Update the state with only the modified task
+                updateTaskUseCase.execute(updatedTask)
                 _tasks.value = _tasks.value.map { if (it.uid == taskId) updatedTask else it }
                 loadUserPoints()
             }
+        }
+    }
+
+    fun updateTask(task: TaskModel) {
+        viewModelScope.launch {
+            // Update the task in the backend/data layer
+            updateTaskUseCase.execute(task)
+
+            // Reflect the updated task in the local state
+            _tasks.value = _tasks.value.map { if (it.uid == task.uid) task else it }
+
+            // Refresh the points in case they changed
+            loadUserPoints()
         }
     }
 
@@ -125,13 +137,14 @@ class TaskViewModel(
     fun addTask(task: TaskModel) {
         viewModelScope.launch {
             addTaskUseCase.execute(task)
+            _tasks.value += task
         }
-        _tasks.value += task
     }
 
     fun deleteTask(task: TaskModel) {
         viewModelScope.launch {
             deleteTaskUseCase.execute(task)
+            _tasks.value = _tasks.value.filterNot { it.uid == task.uid }
         }
     }
 

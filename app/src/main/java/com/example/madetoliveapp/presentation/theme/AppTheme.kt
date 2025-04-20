@@ -14,7 +14,7 @@ val CocoaLight = Color(0xFFD2B6A8)
 // Secondary Range – Muted Sage Green (calming, contrast)
 val Sage = Color(0xFF889A6C)
 val SageDark = Color(0xFF566F64)
-val SageLight = Color(0xFFBFD4C9)
+val SageLight = Color(0xFFAEB897)
 
 // Accent – Deep Blush (used sparingly for highlights or selected states)
 val BlushAccent = Color(0xFFE6A4A6)
@@ -48,6 +48,7 @@ private val LightColorScheme = lightColorScheme(
 
     surface = SurfaceWhite,              // Clean card and component surfaces
     onSurface = SurfaceText,
+    surfaceVariant = CocoaLight,
 
     error = ErrorBackground,             // Soft red for background
     onError = ErrorText
