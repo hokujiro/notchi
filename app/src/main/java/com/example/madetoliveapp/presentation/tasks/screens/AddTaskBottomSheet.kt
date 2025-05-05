@@ -64,8 +64,8 @@ import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
-import com.example.madetoliveapp.presentation.theme.CocoaLight
-import com.example.madetoliveapp.presentation.theme.SageLight
+import com.example.madetoliveapp.presentation.theme.PositiveTaskCheckedAccent
+import com.example.madetoliveapp.presentation.theme.PositiveTaskUncheckedAccent
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,9 +124,9 @@ fun AddTaskBottomSheet(
                         .fillMaxWidth()
                         .height(32.dp),
                     colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.secondary,
-                        activeTrackColor = MaterialTheme.colorScheme.secondary,
-                        inactiveTrackColor = CocoaLight
+                        thumbColor = PositiveTaskCheckedAccent,
+                        activeTrackColor = PositiveTaskCheckedAccent,
+                        inactiveTrackColor = PositiveTaskUncheckedAccent
                     )
                 )
                 Text(
@@ -157,10 +157,14 @@ fun AddTaskBottomSheet(
                             }
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = SageLight,
+                            selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                             selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
                             containerColor = MaterialTheme.colorScheme.surface,
                             labelColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                            selectedBorderColor = MaterialTheme.colorScheme.primary
                         )
                     )
                 }

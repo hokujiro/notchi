@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
+import com.example.madetoliveapp.presentation.theme.FailTaskCheckedAccent
+import com.example.madetoliveapp.presentation.theme.FailTaskUnchecked
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,9 +84,9 @@ fun AddFailBottomSheet(
                         .fillMaxWidth()
                         .height(32.dp), // Increases thickness
                     colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFFA14C4C),
-                        activeTrackColor = Color(0xFFA14C4C),
-                        inactiveTrackColor = Color(0xFFA14C4C)
+                        thumbColor = FailTaskCheckedAccent,
+                        activeTrackColor = FailTaskCheckedAccent,
+                        inactiveTrackColor = FailTaskUnchecked
                     )
                 )
                 Text(

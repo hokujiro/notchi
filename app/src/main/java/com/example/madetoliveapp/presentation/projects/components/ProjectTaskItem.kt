@@ -1,5 +1,4 @@
-package com.example.madetoliveapp.presentation.tasks.components
-
+package com.example.madetoliveapp.presentation.projects.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -11,26 +10,16 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.madetoliveapp.domain.model.TaskModel
+import com.example.madetoliveapp.presentation.tasks.components.CircularCheckbox
+import com.example.madetoliveapp.presentation.tasks.components.PositiveTaskShape
 import com.example.madetoliveapp.presentation.theme.FailTaskChecked
 import com.example.madetoliveapp.presentation.theme.FailTaskCheckedAccent
 import com.example.madetoliveapp.presentation.theme.FailTaskUnchecked
@@ -53,67 +44,9 @@ import com.example.madetoliveapp.presentation.theme.PositiveTaskUnchecked
 import com.example.madetoliveapp.presentation.theme.PositiveTaskUncheckedAccent
 import kotlinx.coroutines.launch
 
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Composable
-fun TaskComponent(
-    tasks: List<TaskModel>,
-    onCheckClick: (String) -> Unit,
-    onDeleteTask: (TaskModel) -> Unit,
-    onTaskClick: (TaskModel) -> Unit,
-    onTaskLongClick: (TaskModel) -> Unit,
-    selectedTasks: Set<String>,
-    selectionMode: Boolean,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier
-            .padding(WindowInsets.systemBars.asPaddingValues())
-    ) {
-        items(
-            items = tasks,
-            key = { task -> task.uid }
-        ) { task ->
-            val dismissState = rememberDismissState(
-                confirmValueChange = {
-                    when (it) {
-                        DismissValue.DismissedToStart -> {
-                            onDeleteTask(task)
-                            true
-                        }
-                        else -> false
-                    }
-                }
-            )
-
-            SwipeToDismiss(
-                modifier = Modifier.animateItemPlacement(),
-                state = dismissState,
-                directions = setOf(DismissDirection.EndToStart),
-                background = { /* same background you already have */ },
-                dismissContent = {
-                    TaskItem(
-                        task = task,
-                        onCheckClick = onCheckClick,
-                        onTaskClick = { clickedTask ->
-                            if (selectionMode) {
-                                onTaskLongClick(clickedTask) // behave like toggle when already selecting
-                            } else {
-                                onTaskClick(clickedTask)
-                            }
-                        },
-                        onLongClick = { onTaskLongClick(task) }, // long press
-                        isSelected = selectedTasks.contains(task.uid) // mark if selected
-                    )
-                }
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TaskItem(
+fun ProjectTaskItem(
     task: TaskModel,
     onCheckClick: (String) -> Unit,
     onTaskClick: (TaskModel) -> Unit,
@@ -169,7 +102,7 @@ fun TaskItem(
         label = "SelectedBorderColor"
     )
 
-    val textColor =Color(0xFF212121)
+    val textColor = Color(0xFF212121)
 
     val pointsColor by animateColorAsState(
         targetValue = if (isChecked) textColor.copy(alpha = 0.7f) else textColor,
@@ -183,7 +116,7 @@ fun TaskItem(
         modifier = modifier
             .fillMaxWidth()
             .offset(y = offsetY.value.dp)
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(vertical = 4.dp)
             .border(1.dp, if (isSelected) selectedBorderColor else borderColor, if (!isFailure) taskShape else RoundedCornerShape(4.dp))
             .combinedClickable(
                 onClick = {
@@ -250,10 +183,10 @@ fun TaskItem(
                     }
 
                     val emphasizedPointsStyle = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = pointsColor
-                        )
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = pointsColor
+                    )
 
                     Text(
                         text = "$points ⭐",

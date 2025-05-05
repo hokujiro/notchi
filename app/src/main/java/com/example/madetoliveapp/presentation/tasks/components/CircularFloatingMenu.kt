@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.madetoliveapp.presentation.theme.FailTaskUnchecked
+import com.example.madetoliveapp.presentation.theme.PositiveTaskChecked
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -41,7 +43,7 @@ fun CircularFloatingMenu(
 
     // Angles: distribute across quarter-circle (135° to 225°)
     val angles = listOf(180f, 225f, 270f)
-    val buttonColors = listOf(Color(0xFFE9F5EC), Color(0xFFE7DED6), Color(0xFFEAF6FB))
+    val buttonColors = listOf(PositiveTaskChecked, FailTaskUnchecked, Color(0xFFEAF6FB))
 
     Box(
         modifier = Modifier

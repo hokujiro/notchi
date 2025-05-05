@@ -29,6 +29,7 @@ import com.example.madetoliveapp.presentation.theme.DarkText
 @Composable
 fun FiltersComponent(
     modifier: Modifier,
+    selectedFilter: TaskFilter,
     onFilterClick: (TaskFilter) -> Unit,
     onSortClick: () -> Unit,
     sortMode: SortMode,
@@ -40,10 +41,10 @@ fun FiltersComponent(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         val emphasizedPointsStyle = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = DarkText // warm fail red
-            )
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = DarkText
+        )
 
         Text(
             text = "$dailyPoints ⭐",
@@ -51,45 +52,25 @@ fun FiltersComponent(
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            IconButton(
-                onClick = { onFilterClick(TaskFilter.POSITIVE) },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = "Positive",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            IconButton(
-                onClick = { onFilterClick(TaskFilter.NEGATIVE) },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    Icons.Default.DisabledByDefault,
-                    contentDescription = "Negative",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            IconButton(
-                onClick = { onFilterClick(TaskFilter.ALL) },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    Icons.Default.AssignmentTurnedIn,
-                    contentDescription = "All",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            // Replace icon buttons with the segmented button
+            TaskFilterSegmentedButton(
+                selectedFilter = selectedFilter,
+                onFilterClick = onFilterClick
+            )
+
+            // Sort icon button
             IconButton(
                 onClick = onSortClick,
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector = if (sortMode == SortMode.BY_POINTS) Icons.Default.Star else Icons.Default.Schedule,
+                    imageVector = if (sortMode == SortMode.BY_POINTS)
+                        Icons.Default.Star
+                    else
+                        Icons.Default.Schedule,
                     contentDescription = "Sort",
                     modifier = Modifier.size(20.dp)
                 )

@@ -1,4 +1,4 @@
-package com.example.madetoliveapp.presentation.tasks.screens
+package com.example.madetoliveapp.presentation.projects.components
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +46,9 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskEditBottomSheet(
+fun ProjectTaskEditBottomSheet(
     task: TaskModel,
-    projects: List<ProjectUiModel>,
+    project: ProjectUiModel,
     onDismiss: () -> Unit,
     onSave: (TaskModel) -> Unit
 ) {
@@ -61,17 +61,10 @@ fun TaskEditBottomSheet(
         )
     }
     var points by remember { mutableFloatStateOf((task.points ?: 0).toFloat()) }
-    var selectedProject by remember {
-        mutableStateOf(
-            projects.find { it.title == task.project?.title }
-        )
-    }
 
     val isFail = task.points != null && task.points < 0
     val actualRange = if (isFail) 10f..100f else 0f..100f // Slider goes "forward"
     val visualPoints = if (isFail) -points else points
-    val displayPoints = if (isFail) -visualPoints.toInt() else visualPoints.toInt()
-    val sliderSteps = if (isFail) 9 else 9
 
     fun snapToTens(value: Float): Float {
         return (value / 10).roundToInt() * 10f
@@ -130,8 +123,8 @@ fun TaskEditBottomSheet(
                     .fillMaxWidth()
                     .height(32.dp),
                 colors = SliderDefaults.colors(
-                    thumbColor = if (isFail)  FailTaskUncheckedAccent else MaterialTheme.colorScheme.secondary,
-                    activeTrackColor = if (isFail)  FailTaskUncheckedAccent else MaterialTheme.colorScheme.secondary,
+                    thumbColor = if (isFail) FailTaskUncheckedAccent else MaterialTheme.colorScheme.secondary,
+                    activeTrackColor = if (isFail) FailTaskUncheckedAccent else MaterialTheme.colorScheme.secondary,
                     inactiveTrackColor = PositiveTaskUncheckedAccent
                 )
             )
@@ -151,38 +144,34 @@ fun TaskEditBottomSheet(
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
             ) {
-                projects.forEach { project ->
-                    val isSelected = project == selectedProject
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            selectedProject = if (isSelected) null else project
-                        },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("${project.icon} ")
-                                Text(project.title)
-                            }
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            selectedBorderColor = MaterialTheme.colorScheme.primary
-                        )
+                FilterChip(
+                    selected = true,
+                    onClick = {
+                    },
+                    label = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("${project.icon} ")
+                            Text(project.title)
+                        }
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        borderColor = MaterialTheme.colorScheme.primary,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary
                     )
-                }
+                )
             }
 
             Spacer(Modifier.height(24.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Button(
                     onClick = {
@@ -190,18 +179,15 @@ fun TaskEditBottomSheet(
                             task.copy(
                                 title = title.text,
                                 points = points.toInt(),
-                                project = TaskProjectModel(
-                                    id = selectedProject?.uid ?: "",
-                                    title = selectedProject?.title ?: "",
-                                    icon = selectedProject?.icon ?: ""
-                                )
                             )
                         )
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Save",
-                        color =  MaterialTheme.colorScheme.background)
+                    Text(
+                        "Save",
+                        color = MaterialTheme.colorScheme.background
+                    )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(

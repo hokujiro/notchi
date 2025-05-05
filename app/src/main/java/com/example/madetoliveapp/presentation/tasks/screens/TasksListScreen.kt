@@ -36,6 +36,7 @@ import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
+import com.example.madetoliveapp.presentation.tasks.TaskFilter
 import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
 import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingMenu
 import com.example.madetoliveapp.presentation.tasks.components.FiltersComponent
@@ -66,6 +67,8 @@ fun TasksScreen(
     var taskToEdit by remember { mutableStateOf<TaskModel?>(null) }
     var currentSheet by remember { mutableStateOf(SheetType.NONE) }
     var isFabExpanded by remember { mutableStateOf(false) }
+
+    var selectedFilter by remember { mutableStateOf(TaskFilter.ALL) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -231,7 +234,11 @@ fun TasksScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .heightIn(max = 80.dp),
-                    taskViewModel::setFilter,
+                    selectedFilter,
+                    onFilterClick = { filter ->
+                        selectedFilter = filter
+                        taskViewModel.setFilter(filter)
+                    },
                     taskViewModel::toggleSortMode,
                     sortMode,
                     dailyPoints,

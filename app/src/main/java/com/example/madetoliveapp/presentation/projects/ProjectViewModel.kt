@@ -23,19 +23,48 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.ZoneId
+import java.util.Date
 
 class ProjectViewModel(
     private val addProjectUseCase: AddProjectUseCase,
+    private val getAllTasksUseCase: GetTasksUseCase,
     private val getAllProjectsUseCase: GetProjectsUseCase,
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val deleteProjectUseCase: DeleteProjectUseCase,
 ) : ViewModel() {
+
+    private val _tasks = MutableStateFlow<List<TaskModel>>(emptyList())
+    val tasks: StateFlow<List<TaskModel>> = _tasks.asStateFlow()
 
     private val _projects = MutableStateFlow<List<ProjectUiModel>>(emptyList())
     val projects: StateFlow<List<ProjectUiModel>> = _projects.asStateFlow()
 
     private val _projectById = MutableStateFlow<ProjectUiModel>(ProjectUiModel())
     val projectById: StateFlow<ProjectUiModel> = _projectById.asStateFlow()
+
+    private val _groupedTasksByDate = MutableStateFlow<Map<LocalDate, List<TaskModel>>>(emptyMap())
+    val groupedTasksByDate: StateFlow<Map<LocalDate, List<TaskModel>>> = _groupedTasksByDate.asStateFlow()
+
+    private val _completedProjectDates = MutableStateFlow<Map<Date, List<TaskModel>>>(emptyMap())
+    val completedProjectDates: StateFlow<Map<Date, List<TaskModel>>> = _completedProjectDates.asStateFlow()
+
+    private val _totalPoints = MutableStateFlow(0)
+    val totalPoints: StateFlow<Int> = _totalPoints.asStateFlow()
+
+    private val _monthlyPoints = MutableStateFlow<Map<YearMonth, Int>>(emptyMap())
+    val monthlyPoints: StateFlow<Map<YearMonth, Int>> = _monthlyPoints.asStateFlow()
+
+    suspend fun getAllTasks() {
+        try {
+            val result = getAllTasksUseCase.execute()
+            _tasks.value = result
+        } catch (e: Exception) {
+            Log.e("TaskViewModel", "Error loading tasks", e)
+        }
+    }
 
     fun addProject(project: ProjectUiModel) {
         viewModelScope.launch {
@@ -54,11 +83,14 @@ class ProjectViewModel(
 
     fun getAllProjects() {
         viewModelScope.launch {
+            getAllTasks()
             try {
                 val result = getAllProjectsUseCase.execute()
 
                 val processedProjects: List<ProjectUiModel> = result.map { project ->
                     val tasks = project.tasksList ?: emptyList()
+                    val completedTasks = tasks.filter { it.checked }
+
                     ProjectUiModel(
                         uid = project.uid,
                         title = project.title,
@@ -66,7 +98,8 @@ class ProjectViewModel(
                         color = project.color,
                         icon = project.icon,
                         totalTasks = tasks.size,
-                        completedTasks = tasks.count { it.checked }
+                        completedTasks = completedTasks.size,
+                        points = completedTasks.sumOf { it.points ?: 0 }
                     )
                 }
 
@@ -99,6 +132,57 @@ class ProjectViewModel(
                 project.uid
             )
             _projects.value = _projects.value.filterNot { it.uid == project.uid }
+        }
+    }
+
+    fun updateCompletedDatesForProject(projectId: String) {
+        viewModelScope.launch {
+            getAllTasks()
+            val completed = _tasks.value.filter { task ->
+                task.checked && task.project?.id == projectId && task.date != null
+            }
+
+            val grouped = completed.groupBy { it.date!! }
+            _completedProjectDates.value = grouped
+        }
+    }
+
+    fun updateGroupedTasksByDate(projectId: String) {
+        viewModelScope.launch {
+            getAllTasks() // Ensure _tasks is updated
+            val grouped = _tasks.value
+                .filter { it.project?.id == projectId && it.date != null }
+                .groupBy { task ->
+                    task.date!!.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                }
+                .toSortedMap(reverseOrder())
+
+            _groupedTasksByDate.value = grouped
+        }
+    }
+
+    fun updatePointsForProject(projectId: String) {
+        viewModelScope.launch {
+            getAllTasks()
+
+            val completed = _tasks.value.filter {
+                it.checked && it.project?.id == projectId && it.points != null && it.date != null
+            }
+
+            // 🔢 Total points
+            _totalPoints.value = completed.sumOf { it.points ?: 0 }
+
+            // 📅 Monthly points
+            val groupedByMonth = completed.groupBy { task ->
+                task.date!!.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .let { YearMonth.from(it) }
+            }
+
+            _monthlyPoints.value = groupedByMonth.mapValues { (_, tasks) ->
+                tasks.sumOf { it.points ?: 0 }
+            }
         }
     }
 }

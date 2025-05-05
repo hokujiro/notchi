@@ -1,7 +1,9 @@
 package com.example.madetoliveapp.presentation.projects.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,30 +11,35 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,26 +47,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.projects.components.AddProjectTaskBottomSheet
+import com.example.madetoliveapp.presentation.projects.components.ProjectCalendar
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
+import com.example.madetoliveapp.presentation.projects.components.CompactSegmentedButtonBar
+import com.example.madetoliveapp.presentation.projects.components.ProjectTaskEditBottomSheet
+import com.example.madetoliveapp.presentation.projects.components.ProjectTaskItem
+import com.example.madetoliveapp.presentation.tasks.components.TaskItem
+import com.example.madetoliveapp.presentation.tasks.screens.AddFailBottomSheet
+import com.example.madetoliveapp.presentation.tasks.screens.AddTaskBottomSheet
+import com.example.madetoliveapp.presentation.tasks.screens.FrameListBottomSheet
+import com.example.madetoliveapp.presentation.tasks.screens.SheetType
+import com.example.madetoliveapp.presentation.tasks.screens.TaskEditBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.time.YearMonth
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ProjectDetailScreen(
     projectId: String,
+    navController: NavController, // Add this parameter
     projectViewModel: ProjectViewModel = koinViewModel(),
     taskViewModel: TaskViewModel = koinViewModel() // or hiltViewModel()
 ) {
     val project by projectViewModel.projectById.collectAsState()
     val taskList by taskViewModel.tasks.collectAsState()
     val filteredTasks = taskList.filter { it.project?.id == projectId }
-
-    var openCreateTaskDialog =
-        remember { mutableStateOf(false) } // State to control dialog visibility
-
+    val selectedSegment = remember { mutableIntStateOf(0) }
+    var currentSheet by remember { mutableStateOf(TaskSheetType.NONE) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -70,135 +92,240 @@ fun ProjectDetailScreen(
         taskViewModel.getAllTasks()
     }
 
-    if (openCreateTaskDialog.value) {
-        AddProjectTaskBottomSheet(
-            onDismiss = { openCreateTaskDialog.value = false },
-            onAddTask = { newTask ->
-                coroutineScope.launch {
-                taskViewModel.addTask(newTask)
-                openCreateTaskDialog.value = false
-                    }
-            },
-            project = projectId
-        )
+    LaunchedEffect(projectId) {
+        projectViewModel.updateCompletedDatesForProject(projectId)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
-    ) {
-        Row {
-            Text(
-                text = project.icon,
-                fontSize = 24.sp
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = project.title,
-                style = MaterialTheme.typography.headlineSmall
+    LaunchedEffect(projectId) {
+        projectViewModel.updateGroupedTasksByDate(projectId)
+    }
+
+    LaunchedEffect(projectId) {
+        projectViewModel.updatePointsForProject(projectId)
+    }
+
+    val groupedTasks by projectViewModel.groupedTasksByDate.collectAsState()
+    val dateFormatter = remember {
+        DateTimeFormatter.ofPattern("EEEE, dd MMMM", Locale.getDefault())
+    }
+    var taskToEdit by remember { mutableStateOf<TaskModel?>(null) }
+
+    val totalPoints by projectViewModel.totalPoints.collectAsState()
+
+    val completedDatesMap by projectViewModel.completedProjectDates.collectAsState()
+    val completedDates = completedDatesMap.keys.map {
+        it.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate() // or use DateTimeFormatter if needed
+    }.toSet()
+    val currentMonth = remember { mutableStateOf(YearMonth.now()) }
+
+    when (currentSheet) {
+        TaskSheetType.ADD_TASK -> {
+            AddProjectTaskBottomSheet(
+                onDismiss = { currentSheet = TaskSheetType.NONE },
+                onAddTask = { newTask ->
+                    coroutineScope.launch {
+                        taskViewModel.addTask(newTask)
+                        currentSheet = TaskSheetType.NONE
+                    }
+                },
+                project = projectId
             )
         }
 
-        Text(
-            text = project.subtitle ?: "",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Tasks",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.weight(1f)) // Pushes the IconButton to the end
-            IconButton(onClick = { openCreateTaskDialog.value = true }) {
-                Icon(
-                    imageVector = Icons.Default.Add, // or any other icon
-                    contentDescription = "Add Task"
+        TaskSheetType.EDIT_TASK -> {
+            taskToEdit?.let { task ->
+                ProjectTaskEditBottomSheet(
+                    task = task,
+                    project = project,
+                    onDismiss = {
+                        currentSheet = TaskSheetType.NONE
+                        taskToEdit = null
+                    },
+                    onSave = {
+                        coroutineScope.launch {
+                            taskViewModel.updateTask(it)
+                            currentSheet = TaskSheetType.NONE
+                            taskToEdit = null
+                        }
+                    }
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        TaskSheetType.NONE -> {}
+        TaskSheetType.ADD_FAIL -> {}
+        TaskSheetType.ADD_FRAME -> {}
+    }
+
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = project.icon,
+                            fontSize = 24.sp
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = project.title,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+
+        }
+    ) { paddingValues ->
 
         LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .heightIn(max = 500.dp)
-        ) {
-            items(filteredTasks) { task ->
-                TaskItem(task,
-                    onTaskClick = { taskId ->
-                    coroutineScope.launch {
-                        taskViewModel.toggleTaskCompletion(taskId)
-                    }
-                })
-            }
-        }
-    }
-}
-
-@Composable
-fun TaskItem(task: TaskModel, onTaskClick: (String) -> Unit) {
-    val backgroundColor =
-        if (task.checked) Color(0xFFECE0D1) else Color(0xFFFFF8E1) // Soft browns/beige
-    val textColor = MaterialTheme.colorScheme.onSurface
-    val pointsTextColor =
-        if (task.checked) Color(0xFF388E3C) else MaterialTheme.colorScheme.onSurface
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable {
-                onTaskClick(task.uid)
-            },
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
-    ) {
-        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Checkbox(
-                checked = task.checked,
-                onCheckedChange = { onTaskClick(task.uid) },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    uncheckedColor = MaterialTheme.colorScheme.primary,
-                    checkmarkColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textDecoration = if (task.checked) TextDecoration.LineThrough else null,
-                        color = textColor
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "$totalPoints ⭐",
+                        style = MaterialTheme.typography.headlineSmall
                     )
-                )
+
+                    CompactSegmentedButtonBar(
+                        selectedIndex = selectedSegment.intValue,
+                        onSegmentSelected = { selectedSegment.intValue = it }
+                    )
+                }
             }
 
-            // Points Badge
-            Text(
-                text = "${task.points} ⭐ ",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = pointsTextColor
-                )
-            )
+            when (selectedSegment.intValue) {
+                0 -> {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(445.dp)
+                        ) {
+                            ProjectCalendar(
+                                yearMonth = currentMonth.value,
+                                completedDates = completedDates,
+                                icon = project.icon,
+                                onMonthChange = { newMonth -> currentMonth.value = newMonth }
+                            )
+                        }
+                    }
+                }
+
+                1 -> {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = project.icon,
+                                    fontSize = 24.sp
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = project.title,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            Text(
+                                text = project.subtitle,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Tasks",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { currentSheet = TaskSheetType.ADD_TASK }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Task")
+                    }
+                }
+            }
+
+            if (filteredTasks.isEmpty()) {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "No tasks yet!",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                }
+            }
+
+            groupedTasks.forEach { (date, tasksForDate) ->
+                item {
+                    Text(
+                        text = date.format(dateFormatter),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                    )
+                }
+
+                items(tasksForDate) { task ->
+                    ProjectTaskItem(
+                        task = task,
+                        onCheckClick = { taskId ->
+                            coroutineScope.launch {
+                                taskViewModel.toggleTaskCompletion(taskId)
+                            }
+                        },
+                        onTaskClick = { taskModel ->
+                            taskToEdit = taskModel
+                            currentSheet = TaskSheetType.EDIT_TASK
+                        },
+                        onLongClick = { taskModel ->
+                            taskViewModel.enableSelectionMode()
+                            taskViewModel.toggleTaskSelection(taskModel.uid)
+                        },
+                        isSelected = taskViewModel.selectedTasks.collectAsState().value.contains(
+                            task.uid
+                        )
+                    )
+                }
+            }
         }
     }
 }
+
+enum class TaskSheetType { ADD_TASK, ADD_FAIL, EDIT_TASK, ADD_FRAME, NONE }
+
+

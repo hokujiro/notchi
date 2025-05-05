@@ -44,6 +44,11 @@ val CottageTypography = Typography(
         color = DarkText
     ),
     titleSmall = TextStyle(
+        fontFamily = CabinSketch,
+        fontSize = 16.sp,
+        color = DarkText
+    ),
+    bodyMedium = TextStyle(
     ),
     labelMedium = TextStyle(
         fontFamily = CabinSketch,

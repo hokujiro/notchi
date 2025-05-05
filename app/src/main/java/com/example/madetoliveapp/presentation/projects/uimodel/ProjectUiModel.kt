@@ -10,5 +10,6 @@ data class ProjectUiModel(
     val color: String = "Color",
     val icon: String = "Icon",
     val totalTasks: Int = 0,
-    val completedTasks: Int = 0
+    val completedTasks: Int = 0,
+    val points: Int = 0
 )

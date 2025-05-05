@@ -6,52 +6,73 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Primary Range – Refined Cocoa
-val CocoaPrimary = Color(0xFF8B6A5C)
-val CocoaDark = Color(0xFF5E4035)
-val CocoaLight = Color(0xFFD2B6A8)
+// Primary Range – Soft Blue Gray
+val MistBlue = Color(0xFFAEC6CF)        // Soft blue-gray
+val MistBlueDark = Color(0xFF7A9BAA)    // Deeper cool blue
+val MistBlueLight = Color(0xFFDCE9ED)
 
-// Secondary Range – Muted Sage Green (calming, contrast)
-val Sage = Color(0xFF889A6C)
-val SageDark = Color(0xFF566F64)
-val SageLight = Color(0xFFAEB897)
+val MistGray = Color(0xFFBFC9CE)        // Less saturated blue-gray
+val MistGrayDark = Color(0xFF8D999F)    // Muted deeper cool gray
+val MistGrayLight = Color(0xFFE4E8EB)// Very light hint of blue
 
-// Accent – Deep Blush (used sparingly for highlights or selected states)
-val BlushAccent = Color(0xFFE6A4A6)
-val BlushDark = Color(0xFFAD7073)
+// Secondary – Light Steel Gray
+val Steel = Color(0xFFB0BEC5)
+val SteelDark = Color(0xFF78909C)
+val SteelLight = Color(0xFFCFD8DC)
 
-// Neutrals
-val SoftNeutral = Color(0xFFE0E0E0)
-val LightPaper = Color(0xFFF8F9FA)
-val DimmedIvory = Color(0xFFE7DED6)
-val SurfaceWhite = Color(0xFFFFFEFD)
+val StoneGray = Color(0xFFC1C9CD)       // Desaturated steel gray
+val StoneDark = Color(0xFF90989D)
+val StoneLight = Color(0xFFD9DEE1)
+
+// Accent – Soft Indigo (optional use)
+val SoftIndigo = Color(0xFF9FA8DA)
+val IndigoDark = Color(0xFF5C6BC0)
+
+val DustyIndigo = Color(0xFFA6ABC4)     // Softer, more gray-toned indigo
+val IndigoMutedDark = Color(0xFF6E7591)
+
+//Neutrals
+val LightGray = Color(0xFFF5F5F5)
+val CoolWhite = Color(0xFFFAFAFA)
+val Cloud = Color(0xFFECEFF1)
 val DarkText = Color(0xFF2E2E2E)
-val SurfaceText = Color(0xFF3A2D28)
-val WarmIvory = Color(0xFFF8F4EF)
+val CharcoalText = Color(0xFF2F2F2F)
+val SubtleText = Color(0xFF4E5D6C)
 
 // Failures
-val ElegantRed = Color(0xFFFCE8E8)
-val ErrorText = Color(0xFF7A1F1F)
-val ErrorBackground = Color(0xFFECC4C4)
+val SoftError = Color(0xFFFCEDED)
+val ErrorTextCool = Color(0xFF8B1E1E)
+
+//Tasks background
+val PositiveTaskUnchecked = Color(0xFFF8F9FA)
+val PositiveTaskChecked =  Color(0xFFE9F5EC)
+val FailTaskUnchecked = Color(0xFFDADADA)   // dusty light gray
+val FailTaskChecked = Color(0xFF9EA4A6)
+
+//Tasks border
+val PositiveTaskUncheckedAccent = Color(0xFFE0E0E0)
+val PositiveTaskCheckedAccent =  Color(0xFFAED9C5)
+val FailTaskUncheckedAccent = Color(0xFF7A7A7A)  // muted charcoal (cooler than brown)
+val FailTaskCheckedAccent = Color(0xFF5A5F60)
 
 private val LightColorScheme = lightColorScheme(
-    primary = CocoaPrimary,              // Refined neutral anchor
+    primary = MistGray,
     onPrimary = Color.White,
 
-    secondary = Sage,                    // Calming green for chips, headers
+    secondary = StoneGray,
     onSecondary = Color.White,
 
-    tertiary = BlushAccent,              // Soft accent color (used sparingly)
+    tertiary = DustyIndigo,
 
-    background = WarmIvory,                // Slightly deeper ivory for warmth
-    onBackground = DarkText,
+    background = CoolWhite,
+    onBackground = CharcoalText,
 
-    surface = SurfaceWhite,              // Clean card and component surfaces
-    onSurface = SurfaceText,
-    surfaceVariant = CocoaLight,
+    surface = LightGray,
+    onSurface = SubtleText,
+    surfaceVariant = MistBlueLight,
 
-    error = ErrorBackground,             // Soft red for background
-    onError = ErrorText
+    error = SoftError,
+    onError = ErrorTextCool
 )
 @Composable
 fun MadeToLiveTheme(

@@ -13,6 +13,6 @@ val presentationModule = module {
     single { TokenManager(androidContext()) }
     viewModel { TaskViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get(), get(), get()) }
-    viewModel { ProjectViewModel(get(), get(), get(), get()) }
+    viewModel { ProjectViewModel(get(), get(), get(), get(), get()) }
     viewModel { FrameViewModel(get(), get(), get(), get(), get(), get()) }
 }

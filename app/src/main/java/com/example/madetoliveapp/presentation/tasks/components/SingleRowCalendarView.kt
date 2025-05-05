@@ -1,6 +1,7 @@
 package com.example.madetoliveapp.presentation.tasks.components
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -115,18 +116,21 @@ fun ContentItem(
     date: CalendarUiModel.Date,
     onClickListener: (CalendarUiModel.Date) -> Unit,
 ) {
+    val isSelected = date.isSelected
+
     Card(
         modifier = Modifier
-            .clickable { // making the element clickable, by adding 'clickable' modifier
-                onClickListener(date)
-            },
+            .clickable { onClickListener(date) },
         colors = CardDefaults.cardColors(
-            containerColor = if (date.isSelected) {
+            containerColor = if (isSelected) {
                 MaterialTheme.colorScheme.primary
             } else {
-                MaterialTheme.colorScheme.secondary
+                MaterialTheme.colorScheme.background // match app background
             }
         ),
+        border = if (!isSelected) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
+        } else null
     ) {
         Column(
             modifier = Modifier
@@ -135,12 +139,12 @@ fun ContentItem(
                 .padding(4.dp)
         ) {
             Text(
-                text = date.day, // day "Mon", "Tue"
+                text = date.day,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
-                text = date.date.dayOfMonth.toString(), // date "15", "16"
+                text = date.date.dayOfMonth.toString(),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.bodyMedium,
             )

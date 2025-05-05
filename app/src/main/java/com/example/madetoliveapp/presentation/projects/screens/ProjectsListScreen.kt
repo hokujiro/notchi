@@ -12,18 +12,22 @@ import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
@@ -32,8 +36,11 @@ import androidx.navigation.NavController
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
+import com.example.madetoliveapp.presentation.theme.DarkText
+import com.example.madetoliveapp.presentation.theme.PositiveTaskCheckedAccent
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsListScreen(
     navController: NavController,
@@ -46,6 +53,18 @@ fun ProjectsListScreen(
     }
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Projects",
+                        fontSize = 18.sp, // Smaller font
+                        modifier = Modifier.padding(vertical = 4.dp) // Less padding
+                    )
+                },
+                windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Horizontal) // Removes default top padding
+            )
+        },
         bottomBar = { BottomNavigationBar(selectedRoute = "projects") },
         floatingActionButton = {
             FloatingActionButton(
@@ -142,16 +161,28 @@ fun ProjectItem(project: ProjectUiModel, onProjectClick: (String) -> Unit) {
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = project.icon,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = project.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
                 Text(
-                    text = project.icon,
-                    fontSize = 24.sp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = project.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    text = "${project.points} ⭐",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color =  MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -162,7 +193,7 @@ fun ProjectItem(project: ProjectUiModel, onProjectClick: (String) -> Unit) {
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Tasks completed",
                     modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.secondary
+                    tint = PositiveTaskCheckedAccent
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(

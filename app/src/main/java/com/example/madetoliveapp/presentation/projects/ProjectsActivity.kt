@@ -42,7 +42,7 @@ class ProjectsActivity : ComponentActivity() {
                     ) { backStackEntry ->
                         val projectId = backStackEntry.arguments?.getString("projectId")
                         if (projectId != null) {
-                            ProjectDetailScreen(projectId)
+                            ProjectDetailScreen(projectId, navController = navController)
                         }
                     }
                 }
