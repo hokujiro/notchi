@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +44,7 @@ import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
 import com.example.madetoliveapp.presentation.projects.components.AddProjectTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -58,6 +60,8 @@ fun ProjectDetailScreen(
     var openCreateTaskDialog =
         remember { mutableStateOf(false) } // State to control dialog visibility
 
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         projectViewModel.getProjectById(projectId)
     }
@@ -70,8 +74,10 @@ fun ProjectDetailScreen(
         AddProjectTaskBottomSheet(
             onDismiss = { openCreateTaskDialog.value = false },
             onAddTask = { newTask ->
+                coroutineScope.launch {
                 taskViewModel.addTask(newTask)
                 openCreateTaskDialog.value = false
+                    }
             },
             project = projectId
         )
@@ -128,7 +134,12 @@ fun ProjectDetailScreen(
                 .heightIn(max = 500.dp)
         ) {
             items(filteredTasks) { task ->
-                TaskItem(task, onTaskClick = taskViewModel::toggleTaskCompletion)
+                TaskItem(task,
+                    onTaskClick = { taskId ->
+                    coroutineScope.launch {
+                        taskViewModel.toggleTaskCompletion(taskId)
+                    }
+                })
             }
         }
     }

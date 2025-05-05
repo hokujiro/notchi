@@ -3,6 +3,7 @@ package com.example.madetoliveapp.data.repository.tasks
 import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
+import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.TaskModel
 
 class TaskRepositoryImpl(
@@ -77,6 +78,29 @@ class TaskRepositoryImpl(
         } else {
             throw Exception("Failed to load daily points: ${response.errorBody()?.string()}")
         }
+    }
+
+    override suspend fun getAllFrames(): List<FrameModel> {
+        val response = taskApi.getAllFrames()
+        if (response.isSuccessful) {
+            return response.body()?.map { mapper.toFrameDomainModel(it) } ?: emptyList()
+        } else {
+            throw Exception("Failed to load frames: ${response.errorBody()?.string()}")
+        }
+    }
+
+    override suspend fun addFrame(frame: FrameModel) {
+        taskApi.addFrame(mapper.toFrameEntity(frame))
+    }
+
+    override suspend fun addTaskList(taskList: List<TaskModel>) {
+        val taskEntities = taskList.map { mapper.toTaskEntity(it) }
+        taskApi.addTaskList(taskEntities)
+    }
+
+    override suspend fun deleteTaskList(taskList: List<TaskModel>) {
+        val taskIds = taskList.map {it.uid}
+        taskApi.deleteTaskList(taskIds)
     }
 
 }

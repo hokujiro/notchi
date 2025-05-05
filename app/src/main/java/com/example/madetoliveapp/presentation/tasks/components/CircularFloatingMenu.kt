@@ -1,9 +1,6 @@
 package com.example.madetoliveapp.presentation.tasks.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,19 +8,18 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterFrames
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -38,13 +34,14 @@ fun CircularFloatingMenu(
     isExpanded: Boolean,
     onToggle: () -> Unit,
     onActionClick: (Int) -> Unit,
-    actionIcons: List<ImageVector> = listOf(Icons.Default.Add, Icons.Default.Add, Icons.Default.Add)
+    actionIcons: List<ImageVector> = listOf(Icons.Outlined.CheckCircle, Icons.Outlined.Cancel , Icons.Default.FilterFrames)
 ) {
     val density = LocalDensity.current
     val radius = 100.dp
 
     // Angles: distribute across quarter-circle (135° to 225°)
     val angles = listOf(180f, 225f, 270f)
+    val buttonColors = listOf(Color(0xFFE9F5EC), Color(0xFFE7DED6), Color(0xFFEAF6FB))
 
     Box(
         modifier = Modifier
@@ -61,7 +58,7 @@ fun CircularFloatingMenu(
                     FloatingActionButton(
                         onClick = { onActionClick(index) },
                         shape = CircleShape,
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                        containerColor = buttonColors[index],
                         modifier = Modifier
                             .size(48.dp)
                             .offset { IntOffset(x.roundToInt(), y.roundToInt()) }

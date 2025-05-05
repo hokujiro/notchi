@@ -1,11 +1,13 @@
 package com.example.madetoliveapp.data.mapper
 
 import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
+import com.example.madetoliveapp.data.entity.FrameEntity
 import com.example.madetoliveapp.data.entity.ProjectEntity
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.entity.TaskProjectEntity
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
+import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.ProjectModel
 import com.example.madetoliveapp.domain.model.SubTaskModel
 import com.example.madetoliveapp.domain.model.TaskModel
@@ -79,6 +81,23 @@ class RemoteMapperImpl : RemoteMapper {
             subTasks = toSubTasksModel(entity.subTasks ?: emptyList()),
             date = stringToDate(entity.date),
             points = entity.points
+        )
+    }
+
+    override fun toFrameDomainModel(entity: FrameEntity): FrameModel {
+        return FrameModel(
+            uid = entity.uid.toString(),
+            title =  entity.title,
+            project = toTaskProjectDomainModel(entity.project),
+            points = entity.points
+        )
+    }
+
+    override fun toFrameEntity(model: FrameModel): FrameEntity {
+        return FrameEntity(
+            title = model.title,
+            project = toTaskProjectEntity(model.project),
+            points = model.points
         )
     }
 

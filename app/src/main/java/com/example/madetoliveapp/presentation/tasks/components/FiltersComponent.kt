@@ -28,15 +28,14 @@ import com.example.madetoliveapp.presentation.theme.DarkText
 
 @Composable
 fun FiltersComponent(
+    modifier: Modifier,
     onFilterClick: (TaskFilter) -> Unit,
     onSortClick: () -> Unit,
     sortMode: SortMode,
     dailyPoints: Int
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -51,7 +50,6 @@ fun FiltersComponent(
             style = emphasizedPointsStyle
         )
 
-        // RIGHT: Filter buttons
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically

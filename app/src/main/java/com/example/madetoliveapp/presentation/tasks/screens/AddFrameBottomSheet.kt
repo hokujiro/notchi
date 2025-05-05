@@ -1,21 +1,43 @@
-package com.example.madetoliveapp.presentation.tasks.components
+package com.example.madetoliveapp.presentation.tasks.screens
 
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -33,8 +55,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
 import com.example.madetoliveapp.presentation.projects.uimodel.ProjectUiModel
@@ -44,17 +70,15 @@ import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskBottomSheet(
+fun AddFrameBottomSheet(
     onDismiss: () -> Unit,
-    onAddTask: (TaskModel) -> Unit,
-    selectedDate: Long,
+    onAddFrame: (FrameModel) -> Unit,
     projects: List<ProjectUiModel> = listOf()
 ) {
     var title by remember { mutableStateOf("") }
-    var subtitle by remember { mutableStateOf("") }
     var selectedProject by remember { mutableStateOf(projects.firstOrNull()) }
     var points by remember { mutableFloatStateOf(0f) }
-    var selectedIcon by remember { mutableStateOf("✅") }
+    var isAddedAsFrame by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -66,8 +90,11 @@ fun AddTaskBottomSheet(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Add new task", style = MaterialTheme.typography.titleLarge)
-
+            Text(
+                text = "Add Frame",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
             val transparentHandle = TextSelectionColors(
                 handleColor = Color.Transparent,
                 backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) // or any selection bg color
@@ -140,12 +167,9 @@ fun AddTaskBottomSheet(
             ) {
                 Button(
                     onClick = {
-                        val parsedDate = Date(selectedDate)
-                        val newTask = TaskModel(
+                        val newFrame = FrameModel(
+                            uid = "",
                             title = title.ifBlank { "Tarea sin título" },
-                            checked = false,
-                            subTasks = listOf(),
-                            date = parsedDate,
                             points = points.toInt(),
                             project = TaskProjectModel(
                                 id = selectedProject?.uid ?: "",
@@ -153,12 +177,12 @@ fun AddTaskBottomSheet(
                                 icon = selectedProject?.icon ?: ""
                             )
                         )
-                        onAddTask(newTask)
+
+                        onAddFrame(newFrame)
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Agregar",
-                        color =  MaterialTheme.colorScheme.background)
+                    Text("Agregar", color = MaterialTheme.colorScheme.background)
                 }
                 OutlinedButton(
                     onClick = onDismiss,
@@ -169,7 +193,6 @@ fun AddTaskBottomSheet(
             }
         }
     }
-
-
 }
+
 

@@ -1,11 +1,22 @@
 package com.example.madetoliveapp.presentation.tasks.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,28 +25,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.presentation.tasks.TaskViewModel
 import com.example.madetoliveapp.presentation.components.BottomNavigationBar
 import com.example.madetoliveapp.presentation.projects.ProjectViewModel
-import com.example.madetoliveapp.presentation.tasks.components.AddFailBottomSheet
-import com.example.madetoliveapp.presentation.tasks.components.AddTaskBottomSheet
 import com.example.madetoliveapp.presentation.tasks.components.CalendarHeader
 import com.example.madetoliveapp.presentation.tasks.components.CircularFloatingMenu
 import com.example.madetoliveapp.presentation.tasks.components.FiltersComponent
 import com.example.madetoliveapp.presentation.tasks.components.HeaderComponent
 import com.example.madetoliveapp.presentation.tasks.components.TaskComponent
-import com.example.madetoliveapp.presentation.tasks.components.TaskEditBottomSheet
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.ZoneId
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel: ProjectViewModel = koinViewModel()) {
-
+fun TasksScreen(
+    taskViewModel: TaskViewModel = koinViewModel(),
+    projectViewModel: ProjectViewModel = koinViewModel()
+) {
     var selectedDate by remember {
         mutableLongStateOf(
             LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -43,25 +59,20 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
     }
     val tasks by taskViewModel.visibleTasks.collectAsState()
     val projects by projectViewModel.projects.collectAsState()
-    val totalPoints by taskViewModel.totalPoints.collectAsState() // Make sure this exists!
-    val taskFilter by taskViewModel.taskFilter.collectAsState() // Make sure this exists!
-    val sortMode by taskViewModel.sortMode.collectAsState() // Make sure this exists!
+    val totalPoints by taskViewModel.totalPoints.collectAsState()
+    val sortMode by taskViewModel.sortMode.collectAsState()
     val dailyPoints by taskViewModel.dailyPoints.collectAsState()
 
     var taskToEdit by remember { mutableStateOf<TaskModel?>(null) }
-
-
     var currentSheet by remember { mutableStateOf(SheetType.NONE) }
     var isFabExpanded by remember { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
 
+    // Launch initial loads
     LaunchedEffect(Unit) {
         taskViewModel.getTasksForDay(selectedDate)
-    }
-    LaunchedEffect(Unit) {
         taskViewModel.loadUserPoints()
-    }
-    LaunchedEffect(Unit) {
         projectViewModel.getAllProjects()
     }
 
@@ -76,24 +87,31 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
                     currentSheet = when (index) {
                         0 -> SheetType.ADD_TASK
                         1 -> SheetType.ADD_FAIL
+                        2 -> SheetType.ADD_FRAME
                         else -> SheetType.NONE
                     }
                 }
             )
         }
     ) { paddingValues ->
-        val outerScrollState = rememberScrollState()
 
         when (currentSheet) {
             SheetType.ADD_TASK -> {
                 AddTaskBottomSheet(
                     onDismiss = { currentSheet = SheetType.NONE },
                     onAddTask = {
-                        taskViewModel.addTask(it)
-                        currentSheet = SheetType.NONE
+                        coroutineScope.launch {
+                            taskViewModel.addTask(it)
+                            currentSheet = SheetType.NONE
+                        }
                     },
                     selectedDate = selectedDate,
-                    projects = projects
+                    projects = projects,
+                    onAddFrame = {
+                        coroutineScope.launch {
+                            taskViewModel.addFrame(it)
+                        }
+                    }
                 )
             }
 
@@ -101,8 +119,10 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
                 AddFailBottomSheet(
                     onDismiss = { currentSheet = SheetType.NONE },
                     onAddTask = {
-                        taskViewModel.addTask(it)
-                        currentSheet = SheetType.NONE
+                        coroutineScope.launch {
+                            taskViewModel.addTask(it)
+                            currentSheet = SheetType.NONE
+                        }
                     },
                     selectedDate = selectedDate,
                     projects = projects
@@ -119,12 +139,25 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
                             taskToEdit = null
                         },
                         onSave = {
-                            taskViewModel.updateTask(it)
-                            currentSheet = SheetType.NONE
-                            taskToEdit = null
+                            coroutineScope.launch {
+                                taskViewModel.updateTask(it)
+                                currentSheet = SheetType.NONE
+                                taskToEdit = null
+                            }
                         }
                     )
                 }
+            }
+
+            SheetType.ADD_FRAME -> {
+                FrameListBottomSheet(
+                    projects = projects,
+                    onDismiss = {
+                        currentSheet = SheetType.NONE
+                        taskToEdit = null
+                    },
+                    selectedDate = selectedDate,
+                )
             }
 
             SheetType.NONE -> {}
@@ -132,44 +165,99 @@ fun TasksScreen(taskViewModel: TaskViewModel = koinViewModel(), projectViewModel
 
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize()  // <-- important!!!
                 .padding(paddingValues)
         ) {
-
-            HeaderComponent(totalPoints, paddingValues, outerScrollState)
+            HeaderComponent(
+                modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 100.dp),
+                totalPoints = totalPoints
+            )
 
             CalendarHeader(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 135.dp),
                 selectedDate = selectedDate,
                 onDateSelected = { date ->
                     selectedDate = date
-                    taskViewModel.getTasksForDay(date) // Fetch tasks for the selected date
+                    coroutineScope.launch {
+                        taskViewModel.getTasksForDay(date)
+                    }
                 }
             )
 
-            FiltersComponent(
-                taskViewModel::setFilter,
-                taskViewModel::toggleSortMode,
-                sortMode,
-                dailyPoints,
-            )
+            if (taskViewModel.selectionMode.collectAsState().value) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                taskViewModel.deleteSelectedTasks()
+                            }
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Selected",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                taskViewModel.saveSelectedTasksAsFrames()
+                            }
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = "Save Selected as Frames",
+                            tint = Color(0xFF4CAF50),
+                        )
+                    }
+                }
+            } else {
+                FiltersComponent(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .heightIn(max = 80.dp),
+                    taskViewModel::setFilter,
+                    taskViewModel::toggleSortMode,
+                    sortMode,
+                    dailyPoints,
+                )
+            }
 
             TaskComponent(
                 tasks = tasks,
-                onCheckClick = taskViewModel::toggleTaskCompletion,
-                onDeleteTask = taskViewModel::deleteTask,
-                onTaskClick = {
-                    taskToEdit = it
+                onCheckClick = { taskId -> coroutineScope.launch { taskViewModel.toggleTaskCompletion(taskId) } },
+                onDeleteTask = { task -> coroutineScope.launch { taskViewModel.deleteTask(task) } },
+                onTaskClick = { task ->
+                    taskToEdit = task
                     currentSheet = SheetType.EDIT_TASK
                 },
+                onTaskLongClick = { task ->
+                    taskViewModel.enableSelectionMode()
+                    taskViewModel.toggleTaskSelection(task.uid)
+                },
+                selectedTasks = taskViewModel.selectedTasks.collectAsState().value,
+                selectionMode = taskViewModel.selectionMode.collectAsState().value,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 500.dp)
+                    .weight(1f)
             )
-
         }
     }
 }
 
-enum class SheetType { ADD_TASK, ADD_FAIL, EDIT_TASK, NONE }
-
+enum class SheetType { ADD_TASK, ADD_FAIL, EDIT_TASK, ADD_FRAME, NONE }

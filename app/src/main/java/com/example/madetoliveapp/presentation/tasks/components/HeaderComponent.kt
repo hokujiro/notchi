@@ -27,14 +27,12 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HeaderComponent(
+    modifier: Modifier = Modifier,
     totalPoints: Int,
-    paddingValues: PaddingValues = PaddingValues(4.dp),
-    outerScrollState: ScrollState
 ) {
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
     ) {
         Row(
             modifier = Modifier

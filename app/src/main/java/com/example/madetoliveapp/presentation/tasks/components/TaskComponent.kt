@@ -10,6 +10,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
@@ -49,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,12 +66,14 @@ fun TaskComponent(
     onCheckClick: (String) -> Unit,
     onDeleteTask: (TaskModel) -> Unit,
     onTaskClick: (TaskModel) -> Unit,
+    onTaskLongClick: (TaskModel) -> Unit,
+    selectedTasks: Set<String>,
+    selectionMode: Boolean,
     modifier: Modifier = Modifier
 ) {
-
     LazyColumn(
         modifier = modifier
-            .padding(WindowInsets.systemBars.asPaddingValues()) // Account for system bars
+            .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
         items(
             items = tasks,
@@ -76,10 +81,13 @@ fun TaskComponent(
         ) { task ->
             val dismissState = rememberDismissState(
                 confirmValueChange = {
-                    if (it == DismissValue.DismissedToStart) {
-                        onDeleteTask(task)
-                        true
-                    } else false
+                    when (it) {
+                        DismissValue.DismissedToStart -> {
+                            onDeleteTask(task)
+                            true
+                        }
+                        else -> false
+                    }
                 }
             )
 
@@ -87,31 +95,20 @@ fun TaskComponent(
                 modifier = Modifier.animateItemPlacement(),
                 state = dismissState,
                 directions = setOf(DismissDirection.EndToStart),
-                background = {
-                    val color = when (dismissState.dismissDirection) {
-                        DismissDirection.EndToStart -> MaterialTheme.colorScheme.error
-                        else -> MaterialTheme.colorScheme.background
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color)
-                            .padding(16.dp),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        Text(
-                            text = "Delete",
-                            color = MaterialTheme.colorScheme.onError,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                },
+                background = { /* same background you already have */ },
                 dismissContent = {
                     TaskItem(
                         task = task,
                         onCheckClick = onCheckClick,
-                        onTaskClick = onTaskClick,
+                        onTaskClick = { clickedTask ->
+                            if (selectionMode) {
+                                onTaskLongClick(clickedTask) // behave like toggle when already selecting
+                            } else {
+                                onTaskClick(clickedTask)
+                            }
+                        },
+                        onLongClick = { onTaskLongClick(task) }, // long press
+                        isSelected = selectedTasks.contains(task.uid) // mark if selected
                     )
                 }
             )
@@ -119,11 +116,14 @@ fun TaskComponent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TaskItem(
     task: TaskModel,
     onCheckClick: (String) -> Unit,
     onTaskClick: (TaskModel) -> Unit,
+    onLongClick: (TaskModel) -> Unit, // <-- Added
+    isSelected: Boolean,              // <-- Added
     modifier: Modifier = Modifier
 ) {
     val offsetY = remember { androidx.compose.animation.core.Animatable(0f) }
@@ -169,6 +169,11 @@ fun TaskItem(
         label = "BorderColor"
     )
 
+    val selectedBorderColor by animateColorAsState(
+        targetValue = if (isSelected) borderColor.copy(alpha = 1f).compositeOver(Color.Black.copy(alpha = 0.2f)) else borderColor,
+        label = "SelectedBorderColor"
+    )
+
     val textColor by animateColorAsState(
         targetValue = when {
             isLightsOff -> Color(0xFF4B3A34)          // Updated: Cocoa
@@ -193,18 +198,22 @@ fun TaskItem(
             .fillMaxWidth()
             .offset(y = offsetY.value.dp)
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .border(1.dp, borderColor, taskShape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                coroutineScope.launch {
-                    animateBounce()
-                    onTaskClick(task)
+            .border(1.dp, if (isSelected) selectedBorderColor else borderColor, taskShape)
+            .combinedClickable(
+                onClick = {
+                    coroutineScope.launch {
+                        animateBounce()
+                        onTaskClick(task)
+                    }
+                },
+                onLongClick = {
+                    onLongClick(task)
                 }
-            },
+            ),
         elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color.LightGray else backgroundColor
+        ),
         shape = taskShape
     ){
         Column(

@@ -8,6 +8,8 @@ import com.example.madetoliveapp.data.mapper.RemoteMapper
 import com.example.madetoliveapp.data.mapper.RemoteMapperImpl
 import com.example.madetoliveapp.data.repository.auth.AuthRepository
 import com.example.madetoliveapp.data.repository.auth.AuthRepositoryImpl
+import com.example.madetoliveapp.data.repository.frames.FrameRepository
+import com.example.madetoliveapp.data.repository.frames.FrameRepositoryImpl
 import com.example.madetoliveapp.data.repository.projects.ProjectRepository
 import com.example.madetoliveapp.data.repository.projects.ProjectRepositoryImpl
 import com.example.madetoliveapp.data.repository.tasks.TaskRepository
@@ -95,6 +97,7 @@ val dataModule = module {
     single<ProjectRepository> { ProjectRepositoryImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
+    single<FrameRepository> { FrameRepositoryImpl(get(), get()) }
     single<RemoteMapper> { RemoteMapperImpl() }
 }
 
