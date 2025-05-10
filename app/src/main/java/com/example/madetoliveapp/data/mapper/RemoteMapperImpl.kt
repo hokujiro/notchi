@@ -3,12 +3,14 @@ package com.example.madetoliveapp.data.mapper
 import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.entity.FrameEntity
 import com.example.madetoliveapp.data.entity.ProjectEntity
+import com.example.madetoliveapp.data.entity.RewardEntity
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.entity.TaskProjectEntity
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
 import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.ProjectModel
+import com.example.madetoliveapp.domain.model.RewardModel
 import com.example.madetoliveapp.domain.model.SubTaskModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
@@ -153,6 +155,26 @@ class RemoteMapperImpl : RemoteMapper {
             total = entity?.total ?: 0f,
             positive = entity?.positive?: 0f,
             negative = entity?.negative?: 0f
+        )
+    }
+
+    override fun toRewardEntity(model: RewardModel): RewardEntity =
+        with(model) {
+            RewardEntity(
+                title = title,
+                project = toTaskProjectEntity(project),
+                points = points?: 0,
+                icon = icon
+            )
+        }
+
+    override fun toRewardModel(entity: RewardEntity): RewardModel {
+        return RewardModel(
+            id = entity.id.toString(),
+            title = entity.title,
+            project = toTaskProjectDomainModel(entity.project),
+            points = entity.points,
+            icon = entity.icon
         )
     }
 }

@@ -306,6 +306,7 @@ fun ProjectDetailScreen(
                         onCheckClick = { taskId ->
                             coroutineScope.launch {
                                 taskViewModel.toggleTaskCompletion(taskId)
+                                projectViewModel.updateGroupedTasksByDate(projectId)
                             }
                         },
                         onTaskClick = { taskModel ->

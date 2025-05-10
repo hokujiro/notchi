@@ -28,7 +28,7 @@
         <item name="shapeAppearanceLargeComponent">@style/RoundedShape</item>
 
         <!-- Status bar -->
-        <item name="android:statusBarColor">@color/deep_brown</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
 
         <!-- Button styling -->
         <item name="materialButtonStyle">@style/CottageButton</item>

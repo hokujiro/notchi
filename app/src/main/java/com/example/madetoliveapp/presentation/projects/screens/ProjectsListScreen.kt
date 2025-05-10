@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -55,6 +56,7 @@ fun ProjectsListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                modifier =  Modifier.background(Color(0xFFEBEBEB)),
                 title = {
                     Text(
                         text = "Projects",

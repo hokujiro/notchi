@@ -3,12 +3,14 @@ package com.example.madetoliveapp.data.mapper
 import com.example.madetoliveapp.data.entity.DailyPointsSummaryEntity
 import com.example.madetoliveapp.data.entity.FrameEntity
 import com.example.madetoliveapp.data.entity.ProjectEntity
+import com.example.madetoliveapp.data.entity.RewardEntity
 import com.example.madetoliveapp.data.entity.SubTaskEntity
 import com.example.madetoliveapp.data.entity.TaskEntity
 import com.example.madetoliveapp.data.entity.TaskProjectEntity
 import com.example.madetoliveapp.domain.model.DailyPointsSummaryModel
 import com.example.madetoliveapp.domain.model.FrameModel
 import com.example.madetoliveapp.domain.model.ProjectModel
+import com.example.madetoliveapp.domain.model.RewardModel
 import com.example.madetoliveapp.domain.model.SubTaskModel
 import com.example.madetoliveapp.domain.model.TaskModel
 import com.example.madetoliveapp.domain.model.TaskProjectModel
@@ -18,6 +20,14 @@ interface RemoteMapper {
     fun toTaskEntity(
         model: TaskModel
     ): TaskEntity
+
+    fun toRewardEntity(
+        model: RewardModel
+    ): RewardEntity
+
+    fun toRewardModel(
+        entity: RewardEntity
+    ): RewardModel
 
     fun toSubTasksModel(
         subTaskEntity: List<SubTaskEntity>
