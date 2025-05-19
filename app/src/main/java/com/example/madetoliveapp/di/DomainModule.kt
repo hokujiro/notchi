@@ -21,6 +21,8 @@ import com.example.madetoliveapp.domain.usecase.frames.AddFrameUseCase
 import com.example.madetoliveapp.domain.usecase.frames.DeleteFrameListUseCase
 import com.example.madetoliveapp.domain.usecase.frames.DeleteFrameUseCase
 import com.example.madetoliveapp.domain.usecase.frames.GetFramesUseCase
+import com.example.madetoliveapp.domain.usecase.rewards.AddRewardUseCase
+import com.example.madetoliveapp.domain.usecase.rewards.GetRewardsUseCase
 import com.example.madetoliveapp.domain.usecase.tasks.AddTaskListUseCase
 import com.example.madetoliveapp.domain.usecase.tasks.DeleteTaskListUseCase
 
@@ -49,5 +51,7 @@ val domainModule = module {
     factory { AddFrameListUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { AddTaskListUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { DeleteTaskListUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { AddRewardUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { GetRewardsUseCase(get()) } // Assuming use case depends on TaskRepository
 
 }

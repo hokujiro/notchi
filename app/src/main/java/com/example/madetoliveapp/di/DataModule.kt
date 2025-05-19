@@ -12,12 +12,15 @@ import com.example.madetoliveapp.data.repository.frames.FrameRepository
 import com.example.madetoliveapp.data.repository.frames.FrameRepositoryImpl
 import com.example.madetoliveapp.data.repository.projects.ProjectRepository
 import com.example.madetoliveapp.data.repository.projects.ProjectRepositoryImpl
+import com.example.madetoliveapp.data.repository.rewards.RewardRepository
+import com.example.madetoliveapp.data.repository.rewards.RewardRepositoryImpl
 import com.example.madetoliveapp.data.repository.tasks.TaskRepository
 import com.example.madetoliveapp.data.repository.tasks.TaskRepositoryImpl
 import com.example.madetoliveapp.data.repository.user.UserRepository
 import com.example.madetoliveapp.data.repository.user.UserRepositoryImpl
 import com.example.madetoliveapp.data.source.local.bbdd.AppDatabase
 import com.example.madetoliveapp.data.source.remote.api.ProjectApi
+import com.example.madetoliveapp.data.source.remote.api.RewardApi
 import com.example.madetoliveapp.data.source.remote.api.TaskApi
 import com.example.madetoliveapp.data.source.remote.api.UserApi
 import com.example.madetoliveapp.data.source.remote.auth.AuthApi
@@ -91,6 +94,7 @@ val dataModule = module {
     single<TaskApi> { get<Retrofit>(named("authenticatedRetrofit")).create(TaskApi::class.java) }
     single<UserApi> { get<Retrofit>(named("authenticatedRetrofit")).create(UserApi::class.java) }
     single<ProjectApi> { get<Retrofit>(named("authenticatedRetrofit")).create(ProjectApi::class.java) }
+    single<RewardApi> { get<Retrofit>(named("authenticatedRetrofit")).create(RewardApi::class.java) }
 
     // Repository
     single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
@@ -98,6 +102,7 @@ val dataModule = module {
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
     single<FrameRepository> { FrameRepositoryImpl(get(), get()) }
+    single<RewardRepository> { RewardRepositoryImpl(get(), get()) }
     single<RemoteMapper> { RemoteMapperImpl() }
 }
 

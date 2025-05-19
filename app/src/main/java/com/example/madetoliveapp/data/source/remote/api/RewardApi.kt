@@ -9,9 +9,9 @@ import retrofit2.http.POST
 
 interface RewardApi {
 
-     @GET("api/projects/all")
+     @GET("api/rewards/all")
      suspend fun getAllRewards(): Response<List<RewardEntity>>
 
-     @POST("api/projects/add")
+     @POST("api/rewards/add")
      suspend fun addReward(@Body reward: RewardEntity): Response<Unit>
 }

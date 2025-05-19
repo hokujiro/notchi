@@ -1,6 +1,5 @@
 package com.example.madetoliveapp.domain.model
 
-import java.util.Date
 import java.util.UUID
 
 data class RewardModel (
@@ -8,5 +7,8 @@ data class RewardModel (
     val title: String = "Title",
     val project: TaskProjectModel?,
     val points: Int?,
-    val icon: String?
+    val icon: String?,
+    val redeemed: Boolean = false,
+    val reusable: Boolean = false,
+    val photo: String? = null,
 )
