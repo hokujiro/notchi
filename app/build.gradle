@@ -7,27 +7,42 @@ plugins {
 }
 
 android {
-    namespace 'com.example.madetoliveapp'
+    namespace 'com.systems.notchi'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.madetoliveapp"
+        applicationId "com.systems.notchi"
         minSdk 34
         targetSdk 34
         versionCode 1
         versionName "1.0"
         android.buildFeatures.buildConfig true
-        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${project.properties["GOOGLE_CLIENT_ID"]}\"")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            storeFile file("my-release-key.jks")
+            storePassword "notchi"
+            keyAlias "notchi"
+            keyPassword "notchi"
         }
     }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "GOOGLE_CLIENT_ID", "\"428928442991-nqu8p0lcisgc87gf7332b2p5vsn62gde.apps.googleusercontent.com\""
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "GOOGLE_CLIENT_ID", "\"428928442991-nqu8p0lcisgc87gf7332b2p5vsn62gde.apps.googleusercontent.com\""
+        }
+        }
+
+
 
     buildFeatures {
         compose true
@@ -72,7 +87,7 @@ dependencies {
 
     //Authentication con Google
     implementation("com.google.android.gms:play-services-auth:21.3.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation "androidx.credentials:credentials:1.3.0"
     implementation "androidx.credentials:credentials-play-services-auth:1.3.0"
     implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
