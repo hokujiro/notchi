@@ -9,3 +9,17 @@ val CottageShapes = Shapes(
     medium = RoundedCornerShape(16.dp),
     large = RoundedCornerShape(16.dp)
 )
+
+val BubbleShapePositive = RoundedCornerShape(
+    topStart = 12.dp,
+    topEnd = 0.dp,
+    bottomEnd = 12.dp,
+    bottomStart = 12.dp
+)
+
+val BubbleShapeNegative = RoundedCornerShape(
+    topStart = 0.dp,
+    topEnd = 12.dp,
+    bottomEnd = 12.dp,
+    bottomStart = 12.dp
+)

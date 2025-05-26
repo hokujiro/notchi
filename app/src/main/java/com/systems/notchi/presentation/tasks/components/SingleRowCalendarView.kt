@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,34 +37,36 @@ import androidx.compose.ui.unit.dp
 import com.systems.notchi.presentation.extensions.CalendarDataSource
 import com.systems.notchi.presentation.extensions.toLocalDate
 import com.systems.notchi.presentation.model.CalendarUiModel
+import com.systems.notchi.presentation.tasks.TaskViewModel
+import com.systems.notchi.presentation.theme.MistBlueLight
+import com.systems.notchi.presentation.theme.MistGrayLight
+import com.systems.notchi.presentation.theme.PositiveTaskChecked
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-
-/*@Preview(showSystemUi = true)
-@Composable
-fun CalendarHeaderPreview() {
-    CalendarHeader(
-        modifier = Modifier.padding(16.dp),
-        onDayClick: (Int) -> Unit
-    )
-}*/
-
 @Composable
 fun CalendarHeader(
     modifier: Modifier = Modifier,
     selectedDate: Long,
-    onDateSelected: (Long) -> Unit
+    onDateSelected: (Long) -> Unit,
+    dailyPointsMap: Map<LocalDate, Int>,
+    onVisibleWeekChange: (startDate: LocalDate, endDate: LocalDate) -> Unit// <-- add this
 ) {
+
     val dataSource = CalendarDataSource()
     var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = selectedDate.toLocalDate())) }
     val listState = rememberLazyListState()
+    LaunchedEffect(calendarUiModel.startDate.date, calendarUiModel.endDate.date) {
+        onVisibleWeekChange(
+            calendarUiModel.startDate.date,
+            calendarUiModel.endDate.date
+        )
+    }
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
         Header(
             data = calendarUiModel,
             onPrevClickListener = { startDate ->
@@ -70,6 +75,7 @@ fun CalendarHeader(
                     startDate = finalStartDate,
                     lastSelectedDate = calendarUiModel.selectedDate.date
                 )
+                onVisibleWeekChange(finalStartDate, finalStartDate.plusDays(6))
             },
             onNextClickListener = { endDate ->
                 val finalStartDate = endDate.plusDays(2)
@@ -77,6 +83,7 @@ fun CalendarHeader(
                     startDate = finalStartDate,
                     lastSelectedDate = calendarUiModel.selectedDate.date
                 )
+                onVisibleWeekChange(finalStartDate, finalStartDate.plusDays(6))
             }
         )
 
@@ -87,15 +94,12 @@ fun CalendarHeader(
                 calendarUiModel = calendarUiModel.copy(
                     selectedDate = date,
                     visibleDates = calendarUiModel.visibleDates.map {
-                        it.copy(
-                            isSelected = it.date.isEqual(date.date)
-                        )
+                        it.copy(isSelected = it.date.isEqual(date.date))
                     }
                 )
-                onDateSelected(
-                    date.date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                )
+                onDateSelected(date.date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli())
             },
+            dailyPointsMap = dailyPointsMap // <-- pass it along
         )
     }
 }
@@ -105,17 +109,19 @@ fun Content(
     data: CalendarUiModel,
     listState: LazyListState,
     onDateClickListener: (CalendarUiModel.Date) -> Unit,
+    dailyPointsMap: Map<LocalDate, Int>
 ) {
-
     LazyRow(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier .fillMaxWidth()
+            .height(200.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
     ) {
         items(items = data.visibleDates) { day ->
             ContentItem(
                 date = day,
-                onClickListener = onDateClickListener
+                onClickListener = onDateClickListener,
+                points = dailyPointsMap[day.date] ?: 0 // provide points for this day
             )
         }
     }
@@ -126,38 +132,38 @@ fun Content(
 fun ContentItem(
     date: CalendarUiModel.Date,
     onClickListener: (CalendarUiModel.Date) -> Unit,
+    points: Int
 ) {
     val isSelected = date.isSelected
+
+    val containerColor = when {
+        isSelected -> MistBlueLight
+        points > 0 -> PositiveTaskChecked
+        points < 0 -> MistGrayLight
+        else -> MaterialTheme.colorScheme.background
+    }
 
     Card(
         modifier = Modifier
             .clickable { onClickListener(date) },
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.background // match app background
-            }
-        ),
-        border = if (!isSelected) {
-            BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
-        } else null
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.secondary) else null
     ) {
         Column(
             modifier = Modifier
-                .width(48.dp)
-                .height(52.dp)
-                .padding(4.dp)
+                .width(60.dp)
+                .height(100.dp)
+                .padding(6.dp)
         ) {
             Text(
                 text = date.day,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium
             )
             Text(
                 text = date.date.dayOfMonth.toString(),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
@@ -177,7 +183,7 @@ fun Header(
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.headlineSmall
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)

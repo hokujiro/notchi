@@ -13,13 +13,17 @@ import com.systems.notchi.domain.usecase.points.GetUserPointsUseCase
 import com.systems.notchi.domain.usecase.frames.AddFrameUseCase
 import com.systems.notchi.domain.usecase.frames.GetFramesUseCase
 import com.systems.notchi.domain.usecase.tasks.DeleteTaskListUseCase
+import com.systems.notchi.domain.usecase.tasks.GetTasksForRangeUseCase
 import com.systems.notchi.domain.usecase.tasks.UpdateTaskUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
+import java.time.ZoneId
 
 class TaskViewModel(
     private val getAllTasksUseCase: GetTasksUseCase,
@@ -31,6 +35,7 @@ class TaskViewModel(
     private val getAllFramesUseCase: GetFramesUseCase,
     private val addFrameUseCase: AddFrameUseCase,
     private val deleteTaskListUseCase: DeleteTaskListUseCase,
+    private val getTasksForRangeUseCase: GetTasksForRangeUseCase
 ) : ViewModel() {
 
     private val _tasks = MutableStateFlow<List<TaskModel>>(emptyList())
@@ -110,6 +115,25 @@ class TaskViewModel(
 
         filtered.filter { it.checked }.sumOf { it.points ?: 0 }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+
+    private val _weeklyTasks = MutableStateFlow<List<TaskModel>>(emptyList())
+    val weeklyPointsMap: StateFlow<Map<LocalDate, Int>> = _weeklyTasks.map { allTasks ->
+        allTasks
+            .filter { it.checked && (it.points ?: 0) != 0 }
+            .groupBy { task ->
+                task.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+            }
+            .filterKeys { it != null }
+            .mapKeys { it.key!! }
+            .mapValues { entry -> entry.value.sumOf { it.points ?: 0 } }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+    suspend fun loadTasksForWeek(start: LocalDate, end: LocalDate) {
+        val startEpoch = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val endEpoch = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        _weeklyTasks.value = getTasksForRangeUseCase.execute(startEpoch, endEpoch)
+    }
 
     fun setFilter(filter: TaskFilter) {
         _taskFilter.value = filter

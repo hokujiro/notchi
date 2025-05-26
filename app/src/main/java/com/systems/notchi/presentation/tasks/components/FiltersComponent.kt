@@ -1,9 +1,11 @@
 package com.systems.notchi.presentation.tasks.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -40,8 +42,10 @@ fun FiltersComponent(
             color = DarkText
         )
 
+        val adjective = if(dailyPoints<0) "lost" else "earned"
+
         Text(
-            text = "$dailyPoints ⭐",
+            text = "⭐ $dailyPoints points $adjective",
             style = emphasizedPointsStyle
         )
 
@@ -55,20 +59,26 @@ fun FiltersComponent(
                 onFilterClick = onFilterClick
             )
 
-            // Sort icon button
+            /*// Sort icon button
             IconButton(
                 onClick = onSortClick,
                 modifier = Modifier.size(32.dp)
             ) {
-                Icon(
-                    imageVector = if (sortMode == SortMode.BY_POINTS)
-                        Icons.Default.Star
-                    else
-                        Icons.Default.Schedule,
-                    contentDescription = "Sort",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = if (sortMode == SortMode.BY_POINTS) Icons.Default.Star else Icons.Default.Schedule,
+                        contentDescription = "Sort base",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowUpward, // Sort indicator
+                        contentDescription = "Sort indicator",
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(10.dp),
+                    )
+                }
+            }*/
         }
     }
 }

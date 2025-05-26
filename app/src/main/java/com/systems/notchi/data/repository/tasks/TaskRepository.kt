@@ -15,5 +15,6 @@ interface TaskRepository {
     suspend fun addFrame(frame: FrameModel)
     suspend fun addTaskList(taskList: List<TaskModel>)
     suspend fun deleteTaskList(taskList: List<TaskModel>)
+    suspend fun getTasksBetween(startDate: Long, endDate: Long): List<TaskModel>
 
 }

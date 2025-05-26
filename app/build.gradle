@@ -22,8 +22,14 @@ android {
     }
 
     signingConfigs {
+        debug {
+            storeFile file("/my-release-key.jks")
+            storePassword "notchi"
+            keyAlias "notchi"
+            keyPassword "notchi"
+        }
         release {
-            storeFile file("my-release-key.jks")
+            storeFile file("/my-release-key.jks")
             storePassword "notchi"
             keyAlias "notchi"
             keyPassword "notchi"
@@ -121,8 +127,9 @@ dependencies {
     implementation "androidx.compose.material3:material3:1.1.0-beta01" // Or the latest version
     implementation "androidx.compose.foundation:foundation:1.5.0" // Compose Foundation library
 
-    //Row Calendar
-    //implementation 'com.michalsvec:single-row-calednar:1.0.0'
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 
     //Gson
     implementation 'com.google.code.gson:gson:2.10.1'

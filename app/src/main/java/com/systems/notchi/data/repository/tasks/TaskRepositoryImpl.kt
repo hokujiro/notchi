@@ -103,4 +103,20 @@ class TaskRepositoryImpl(
         taskApi.deleteTaskList(taskIds)
     }
 
+    override suspend fun getTasksBetween(startDate: Long, endDate: Long): List<TaskModel> {
+        val response = taskApi.getAllTasks()
+
+        if (response.isSuccessful) {
+            val entities = response.body().orEmpty()
+            return entities
+                .map { mapper.toTaskDomainModel(it) }
+                .filter { task ->
+                    val time = task.date?.time
+                    time != null && time in startDate..endDate
+                }
+        }
+
+        return emptyList()
+    }
+
 }

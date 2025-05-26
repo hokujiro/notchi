@@ -7,6 +7,7 @@ import com.systems.notchi.data.entity.RewardEntity
 import com.systems.notchi.data.entity.SubTaskEntity
 import com.systems.notchi.data.entity.TaskEntity
 import com.systems.notchi.data.entity.TaskProjectEntity
+import com.systems.notchi.data.entity.UserEntity
 import com.systems.notchi.domain.model.DailyPointsSummaryModel
 import com.systems.notchi.domain.model.FrameModel
 import com.systems.notchi.domain.model.ProjectModel
@@ -14,6 +15,7 @@ import com.systems.notchi.domain.model.RewardModel
 import com.systems.notchi.domain.model.SubTaskModel
 import com.systems.notchi.domain.model.TaskModel
 import com.systems.notchi.domain.model.TaskProjectModel
+import com.systems.notchi.domain.model.UserModel
 
 interface RemoteMapper {
 
@@ -63,4 +65,6 @@ interface RemoteMapper {
 
     fun toDailyPointsSummaryModel(entity: DailyPointsSummaryEntity?): DailyPointsSummaryModel
 
+    fun toUserModel(dto: UserEntity): UserModel
+    fun toUserEntity(model: UserModel): UserEntity
 }

@@ -203,7 +203,7 @@ fun ProjectDetailScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(445.dp)
+                                .height(480.dp)
                         ) {
                             ProjectCalendar(
                                 yearMonth = currentMonth.value,
@@ -291,6 +291,7 @@ fun ProjectDetailScreen(
                             coroutineScope.launch {
                                 taskViewModel.toggleTaskCompletion(taskId)
                                 projectViewModel.updateGroupedTasksByDate(projectId)
+                                projectViewModel.updateCompletedDatesForProject(projectId)
                             }
                         },
                         onTaskClick = { taskModel ->

@@ -15,7 +15,7 @@ interface AuthApi {
     @POST("api/auth/register")
     suspend fun register(@Body authRequest: AuthRequest): Response<AuthResponse> // Void response for registration
 
-    @POST("auth/google-login")
+    @POST("/api/auth/google-login")
     suspend fun loginWithGoogle(@Body request: GoogleAuthRequest): Response<AuthResponse>
 
     @POST("/api/auth/refresh")

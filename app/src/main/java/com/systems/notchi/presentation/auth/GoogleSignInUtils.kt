@@ -67,19 +67,20 @@ class GoogleSignInUtils {
                     }
                 } catch (e: NoCredentialException) {
                     // Fallback to standard Google Sign-In flow
-                    Log.d("GoogleSignIn", "CredentialManager fallback triggered")
-                    if (launcher != null) {
-                        val signInIntent = GoogleSignIn.getClient(
-                            context,
-                            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
-                                .requestEmail()
-                                .build()
-                        ).signInIntent
-                        launcher.launch(signInIntent)
-                    } else {
-                        onFailure(e)
-                    }
+                    Log.d("GOOGLE_SIGN_IN", "Launching GoogleSignInClient with client ID: ${BuildConfig.GOOGLE_CLIENT_ID}")
+
+                    val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
+                        .requestEmail()
+                        .build()
+
+                    val signInClient = GoogleSignIn.getClient(context, options)
+
+                    val signInIntent = signInClient.signInIntent
+
+                    Log.d("GOOGLE_SIGN_IN", "Sign-in intent created: $signInIntent")
+
+                    launcher?.launch(signInIntent)
                 } catch (e: GetCredentialException) {
                     Log.e("GoogleSignIn", "CredentialManager error: ${e.message}", e)
                     onFailure(e)

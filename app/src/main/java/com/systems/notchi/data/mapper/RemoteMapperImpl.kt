@@ -7,6 +7,7 @@ import com.systems.notchi.data.entity.RewardEntity
 import com.systems.notchi.data.entity.SubTaskEntity
 import com.systems.notchi.data.entity.TaskEntity
 import com.systems.notchi.data.entity.TaskProjectEntity
+import com.systems.notchi.data.entity.UserEntity
 import com.systems.notchi.domain.model.DailyPointsSummaryModel
 import com.systems.notchi.domain.model.FrameModel
 import com.systems.notchi.domain.model.ProjectModel
@@ -14,6 +15,7 @@ import com.systems.notchi.domain.model.RewardModel
 import com.systems.notchi.domain.model.SubTaskModel
 import com.systems.notchi.domain.model.TaskModel
 import com.systems.notchi.domain.model.TaskProjectModel
+import com.systems.notchi.domain.model.UserModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -164,7 +166,9 @@ class RemoteMapperImpl : RemoteMapper {
                 title = title,
                 project = toTaskProjectEntity(project),
                 points = points?: 0,
-                icon = icon
+                icon = icon,
+                redeemed = model.redeemed,
+                reusable = model.reusable,
             )
         }
 
@@ -174,7 +178,29 @@ class RemoteMapperImpl : RemoteMapper {
             title = entity.title,
             project = toTaskProjectDomainModel(entity.project),
             points = entity.points,
-            icon = entity.icon
+            icon = entity.icon,
+            redeemed = entity.redeemed,
+            reusable = entity.reusable,
+        )
+    }
+
+    override fun toUserModel(dto: UserEntity): UserModel {
+        return UserModel(
+            id = dto.id ?: 0L,
+            username = dto.username,
+            email = dto.email,
+            photo = dto.photo,
+            totalPoints = dto.totalPoints ?: 0f
+        )
+    }
+
+    override fun toUserEntity(model: UserModel): UserEntity {
+        return UserEntity(
+            id = model.id,
+            username = model.username,
+            email = model.email,
+            photo = model.photo?:"",
+            totalPoints = model.totalPoints
         )
     }
 }

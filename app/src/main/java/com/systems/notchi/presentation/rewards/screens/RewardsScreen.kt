@@ -1,14 +1,17 @@
 package com.systems.notchi.presentation.rewards.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -48,6 +51,14 @@ import com.systems.notchi.presentation.rewards.components.ExpandableFab
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.unit.sp
+import com.systems.notchi.presentation.theme.CharcoalText
+import com.systems.notchi.presentation.theme.CoolWhite
+import com.systems.notchi.presentation.theme.LightGray
+import com.systems.notchi.presentation.theme.MistBlueLight
+import com.systems.notchi.presentation.theme.MistGrayLight
+import com.systems.notchi.presentation.theme.SubtleText
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,11 +86,26 @@ fun RewardsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                modifier = Modifier.background(Color(0xFFEBEBEB)),
+                modifier = Modifier
+                    .background(Color(0xFFEBEBEB)),
                 title = {
-
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(modifier = Modifier.weight(1f)) // Empty space to center the title
+                        Text(
+                            text = "⭐ $totalPoints points",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 18.sp
+                            ),
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                    }
                 },
-                windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Horizontal) // Removes default top padding
+                windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Horizontal)
             )
         },
         bottomBar = { BottomNavigationBar(selectedRoute = "rewards") },
@@ -178,20 +204,45 @@ fun RewardsScreen(
 fun ReusableRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(180.dp)
-            .padding(8.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation()
+            .width(140.dp)
+            .height(160.dp)
+            .padding(6.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = CoolWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = BorderStroke(1.dp, MistGrayLight)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            if (reward.icon != null) Text(reward.icon, style = MaterialTheme.typography.titleLarge)
-            Text(reward.title, style = MaterialTheme.typography.titleMedium)
-            Text("${reward.points} pts", style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onRedeem) {
-                Text("Canjear")
+            reward.icon?.let {
+                Text(it, style = MaterialTheme.typography.titleMedium)
+            }
+
+            Column {
+                Text(
+                    reward.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = CharcoalText,
+                    maxLines = 2
+                )
+                Text(
+                    "⭐ ${reward.points} pts",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = SubtleText
+                )
+            }
+
+            Button(
+                onClick = onRedeem,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
+            ) {
+                Text("Canjear", style = MaterialTheme.typography.labelMedium)
             }
         }
     }
@@ -202,20 +253,45 @@ fun SingleUseRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
-        shape = RoundedCornerShape(12.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = CoolWhite),
+        border = BorderStroke(1.dp, MistGrayLight)
     ) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (reward.icon != null) Text(reward.icon, style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(reward.title, style = MaterialTheme.typography.titleMedium)
-                Text("${reward.points} pts", style = MaterialTheme.typography.bodySmall)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            reward.icon?.let {
+                Text(it, style = MaterialTheme.typography.titleMedium)
             }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column {
+                Text(
+                    reward.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = CharcoalText
+                )
+                Text(
+                    "⭐ ${reward.points} pts",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = SubtleText
+                )
+            }
+
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onRedeem) {
-                Text("Canjear")
+
+            Button(
+                onClick = onRedeem,
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
+            ) {
+                Text("Canjear", style = MaterialTheme.typography.labelMedium)
             }
         }
     }
