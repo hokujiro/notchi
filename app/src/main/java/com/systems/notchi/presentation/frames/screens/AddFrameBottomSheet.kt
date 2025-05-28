@@ -1,4 +1,4 @@
-package com.systems.notchi.presentation.tasks.screens
+package com.systems.notchi.presentation.frames.screens
 
 
 import androidx.compose.foundation.horizontalScroll

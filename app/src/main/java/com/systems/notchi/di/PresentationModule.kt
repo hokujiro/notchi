@@ -6,7 +6,7 @@ import com.systems.notchi.presentation.auth.TokenManager
 import com.systems.notchi.presentation.profile.ProfileViewModel
 import com.systems.notchi.presentation.projects.ProjectViewModel
 import com.systems.notchi.presentation.rewards.RewardsViewModel
-import com.systems.notchi.presentation.tasks.FrameViewModel
+import com.systems.notchi.presentation.frames.FrameViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module

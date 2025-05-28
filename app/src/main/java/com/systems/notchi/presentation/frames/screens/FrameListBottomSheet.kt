@@ -1,4 +1,4 @@
-package com.systems.notchi.presentation.tasks.screens
+package com.systems.notchi.presentation.frames.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.systems.notchi.domain.model.FrameModel
 import com.systems.notchi.domain.model.TaskModel
 import com.systems.notchi.presentation.projects.uimodel.ProjectUiModel
-import com.systems.notchi.presentation.tasks.FrameViewModel
+import com.systems.notchi.presentation.frames.FrameViewModel
 import com.systems.notchi.presentation.tasks.TaskViewModel
 import com.systems.notchi.presentation.tasks.components.FailTaskShape
 import com.systems.notchi.presentation.tasks.components.PositiveTaskShape
