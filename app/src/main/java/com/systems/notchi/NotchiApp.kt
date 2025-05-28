@@ -12,7 +12,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 
-class MadeToApp : Application() {
+class NotchiApp : Application() {
     lateinit var database: AppDatabase
 
     override fun onCreate() {
@@ -24,7 +24,7 @@ class MadeToApp : Application() {
             // Log Koin into Android logger
             androidLogger()
             // Reference Android context
-            androidContext(this@MadeToApp)
+            androidContext(this@NotchiApp)
             // Load modules
             modules(listOf(dataModule, domainModule, presentationModule))
         }

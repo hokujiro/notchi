@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.systems.notchi"
-        minSdk 34
+        minSdk 23
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -122,6 +122,13 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended:1.7.3'
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation "androidx.emoji2:emoji2-emojipicker:1.5.0"
+    implementation("com.google.accompanist:accompanist-pager:0.36.0")
+
+    // Required for Credential Manager support
+    implementation "androidx.credentials:credentials:1.2.0-alpha02"
+
+    // This is the missing provider: Google Identity Services for credentials
+    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.0"
 
 
     implementation "androidx.compose.material3:material3:1.1.0-beta01" // Or the latest version

@@ -134,11 +134,5 @@ class GoogleSignInUtils {
             val accounts = accountManager.getAccountsByType("com.google")
             return accounts.isNotEmpty()
         }
-
-        fun getIntent(): Intent {
-            return Intent(Settings.ACTION_ADD_ACCOUNT).apply {
-                putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
-            }
-        }
     }
 }

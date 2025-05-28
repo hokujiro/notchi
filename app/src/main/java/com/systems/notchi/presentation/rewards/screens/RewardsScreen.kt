@@ -1,6 +1,7 @@
 package com.systems.notchi.presentation.rewards.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,16 @@ import com.systems.notchi.presentation.rewards.components.ExpandableFab
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.ui.unit.sp
 import com.systems.notchi.presentation.theme.CharcoalText
 import com.systems.notchi.presentation.theme.CoolWhite
@@ -61,7 +71,7 @@ import com.systems.notchi.presentation.theme.MistGrayLight
 import com.systems.notchi.presentation.theme.SubtleText
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RewardsScreen(
     navController: NavController,
@@ -69,13 +79,13 @@ fun RewardsScreen(
     taskViewModel: TaskViewModel = koinViewModel(),
     projectViewModel: ProjectViewModel = koinViewModel()
 ) {
-    var currentSheet by remember { mutableStateOf(SheetType.NONE) }
-    var isFabExpanded by remember { mutableStateOf(false) }
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
     val projects by projectViewModel.projects.collectAsState()
     val totalPoints by taskViewModel.totalPoints.collectAsState()
     val rewards by rewardsViewModel.rewards.collectAsState()
+
 
     LaunchedEffect(Unit) {
         taskViewModel.loadUserPoints()
@@ -86,110 +96,34 @@ fun RewardsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                modifier = Modifier
-                    .background(Color(0xFFEBEBEB)),
                 title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f)) // Empty space to center the title
-                        Text(
-                            text = "⭐ $totalPoints points",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 18.sp
-                            ),
-                            modifier = Modifier.padding(end = 16.dp)
-                        )
-                    }
-                },
-                windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Horizontal)
+                    Text("⭐ $totalPoints puntos", style = MaterialTheme.typography.bodyLarge)
+                }
             )
         },
-        bottomBar = { BottomNavigationBar(selectedRoute = "rewards") },
-        floatingActionButton = {
-            ExpandableFab(
-                onActionClick = { index ->
-                    isFabExpanded = false
-                    currentSheet = when (index) {
-                        0 -> SheetType.ADD_REWARD
-                        1 -> SheetType.ADD_BUNDLE
-                        else -> SheetType.NONE
-                    }
-                },
-                onToggle = { isFabExpanded = !isFabExpanded },
-                isExpanded = isFabExpanded,
-            )
+        bottomBar = {
+            BottomNavigationBar(selectedRoute = "rewards")
         }
     ) { paddingValues ->
-
-        when (currentSheet) {
-            SheetType.ADD_REWARD -> {
-                AddRewardBottomSheet(
-                    onDismiss = { currentSheet = SheetType.NONE },
-                    onAddReward = {
-
-                        coroutineScope.launch {
-                            rewardsViewModel.addReward(it)
-                            currentSheet = SheetType.NONE
-                        }
-                    },
-                    projects = projects,
-                )
-            }
-
-            SheetType.ADD_BUNDLE -> {}
-
-            SheetType.EDIT_REWARD -> {}
-
-            SheetType.NONE -> {}
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item {
-                Text(
-                    "Recompensas disponibles",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            // Rewards Reusables
-            if (rewards.any { it.reusable }) {
-                item {
-                    Text("Reusables", modifier = Modifier.padding(start = 16.dp))
-                    LazyRow(modifier = Modifier.padding(8.dp)) {
-                        items(rewards.filter { it.reusable }) { reward ->
-                            ReusableRewardCard(
-                                reward = reward,
-                                onRedeem = {
-                                    coroutineScope.launch {
-                                        rewardsViewModel.redeemReward(reward)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Rewards de un solo uso
-            if (rewards.any { !it.reusable }) {
-                item {
-                    Text("Uso único", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
-                }
-                items(rewards.filter { !it.reusable && !it.redeemed }) { reward ->
-                    SingleUseRewardCard(
-                        reward = reward,
+        Column(modifier = Modifier.padding(paddingValues)) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> ReusableRewardsPage(
+                        rewards = rewards.filter { it.reusable },
                         onRedeem = {
                             coroutineScope.launch {
-                                rewardsViewModel.redeemReward(reward)
+                                rewardsViewModel.redeemReward(it)
+                            }
+                        }
+                    )
+                    1 -> SingleUseRewardsPage(
+                        rewards = rewards.filter { !it.reusable },
+                        onRedeem = {
+                            coroutineScope.launch {
+                                rewardsViewModel.redeemReward(it)
                             }
                         }
                     )
@@ -199,6 +133,26 @@ fun RewardsScreen(
     }
 }
 
+
+@Composable
+fun ReusableRewardsPage(
+    rewards: List<RewardModel>,
+    onRedeem: (RewardModel) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 160.dp),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(rewards) { reward ->
+            ReusableRewardCard(
+                reward = reward,
+                onRedeem = { onRedeem(reward) }
+            )
+        }
+    }
+}
 
 @Composable
 fun ReusableRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
@@ -249,49 +203,70 @@ fun ReusableRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
 }
 
 @Composable
-fun SingleUseRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
+fun SingleUseRewardsPage(
+    rewards: List<RewardModel>,
+    onRedeem: (RewardModel) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(rewards) { reward ->
+            TicketRewardItem(
+                reward = reward,
+                onRedeem = { onRedeem(reward) }
+            )
+        }
+    }
+}
+
+@Composable
+fun TicketRewardItem(
+    reward: RewardModel,
+    onRedeem: () -> Unit
+) {
+    val isRedeemed = reward.redeemed
+    val shape = if (isRedeemed) {
+        // Simulate "torn" ticket by altering shape
+        CutCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
+    } else {
+        RoundedCornerShape(12.dp)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            .height(100.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = CoolWhite),
         border = BorderStroke(1.dp, MistGrayLight)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             reward.icon?.let {
                 Text(it, style = MaterialTheme.typography.titleMedium)
             }
-
             Spacer(modifier = Modifier.width(12.dp))
-
-            Column {
-                Text(
-                    reward.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = CharcoalText
-                )
-                Text(
-                    "⭐ ${reward.points} pts",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = SubtleText
-                )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(reward.title, style = MaterialTheme.typography.bodyMedium)
+                Text("⭐ ${reward.points} pts", style = MaterialTheme.typography.labelSmall)
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = onRedeem,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
-            ) {
-                Text("Canjear", style = MaterialTheme.typography.labelMedium)
+            if (!isRedeemed) {
+                Button(
+                    onClick = onRedeem,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
+                ) {
+                    Text("Canjear", style = MaterialTheme.typography.labelMedium)
+                }
+            } else {
+                Icon(Icons.Default.Done, contentDescription = "Redeemed", tint = Color.Gray)
             }
         }
     }
