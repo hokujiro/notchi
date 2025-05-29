@@ -189,7 +189,7 @@ fun TasksScreen(
                 CalendarHeader(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 150.dp),
+                        .heightIn(max = 147.dp),
                     selectedDate = selectedDate,
                     onDateSelected = { date ->
                         selectedDate = date
@@ -275,13 +275,13 @@ fun TasksScreen(
                         Image(
                             painter = painterResource(id = R.drawable.no_tasks), // 🔁 Replace with your drawable
                             contentDescription = "No tasks",
-                            modifier = Modifier.size(300.dp)
+                            modifier = Modifier.size(200.dp)
                         )
                         Text(
                             text = "No tasks yet for today,\nadd your first one!",
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = 22.sp, // 👈 increase this as needed
+                                fontSize = 18.sp, // 👈 increase this as needed
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         )

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterFrames
 import androidx.compose.material.icons.outlined.Cancel
@@ -34,7 +35,7 @@ fun CircularFloatingMenu(
     isExpanded: Boolean,
     onToggle: () -> Unit,
     onActionClick: (Int) -> Unit,
-    actionIcons: List<ImageVector> = listOf(Icons.Outlined.CheckCircle, Icons.Outlined.Cancel , Icons.Default.FilterFrames)
+    actionIcons: List<ImageVector> = listOf(Icons.Outlined.CheckCircle, Icons.Outlined.Cancel , Icons.Default.Archive)
 ) {
     val density = LocalDensity.current
     val radius = 100.dp

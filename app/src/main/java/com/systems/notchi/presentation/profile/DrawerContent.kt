@@ -105,7 +105,7 @@ fun DrawerContent(
 
             Column {
                 Text(username, style = MaterialTheme.typography.titleMedium)
-                Text("user@email.com", style = MaterialTheme.typography.bodySmall) // Replace with real email if needed
+                //Text(username, style = MaterialTheme.typography.bodySmall) // Replace with real email if needed
             }
         }
 

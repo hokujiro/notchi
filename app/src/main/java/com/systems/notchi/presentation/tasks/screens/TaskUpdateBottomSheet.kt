@@ -138,43 +138,45 @@ fun TaskEditBottomSheet(
 
             Spacer(Modifier.height(16.dp))
 
-            Text(
-                text = "Project",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            if(projects.isNotEmpty()) {
+                Text(
+                    text = "Project",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-            ) {
-                projects.forEach { project ->
-                    val isSelected = project == selectedProject
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            selectedProject = if (isSelected) null else project
-                        },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("${project.icon} ")
-                                Text(project.title)
-                            }
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            selectedBorderColor = MaterialTheme.colorScheme.primary
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                ) {
+                    projects.forEach { project ->
+                        val isSelected = project == selectedProject
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedProject = if (isSelected) null else project
+                            },
+                            label = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("${project.icon} ")
+                                    Text(project.title)
+                                }
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                labelColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                selectedBorderColor = MaterialTheme.colorScheme.primary
+                            )
                         )
-                    )
+                    }
                 }
             }
 

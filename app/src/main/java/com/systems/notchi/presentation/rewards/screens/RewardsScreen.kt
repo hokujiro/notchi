@@ -2,6 +2,7 @@ package com.systems.notchi.presentation.rewards.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +53,7 @@ import com.systems.notchi.presentation.rewards.components.AddRewardBottomSheet
 import com.systems.notchi.presentation.rewards.components.ExpandableFab
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -62,7 +65,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.systems.notchi.R
 import com.systems.notchi.presentation.theme.CharcoalText
 import com.systems.notchi.presentation.theme.CoolWhite
 import com.systems.notchi.presentation.theme.LightGray
@@ -79,6 +85,9 @@ fun RewardsScreen(
     taskViewModel: TaskViewModel = koinViewModel(),
     projectViewModel: ProjectViewModel = koinViewModel()
 ) {
+    var currentSheet by remember { mutableStateOf(SheetType.NONE) }
+    var isFabExpanded by remember { mutableStateOf(false) }
+
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
@@ -103,8 +112,45 @@ fun RewardsScreen(
         },
         bottomBar = {
             BottomNavigationBar(selectedRoute = "rewards")
-        }
+        },
+                floatingActionButton = {
+                    ExpandableFab(
+                        onActionClick = { index ->
+                            isFabExpanded = false
+                            currentSheet = when (index) {
+                                0 -> SheetType.ADD_REWARD
+                                1 -> SheetType.ADD_BUNDLE
+                                else -> SheetType.NONE
+                            }
+                        },
+                        onToggle = { isFabExpanded = !isFabExpanded },
+                        isExpanded = isFabExpanded,
+                    )
+                }
     ) { paddingValues ->
+
+        when (currentSheet) {
+            SheetType.ADD_REWARD -> {
+                AddRewardBottomSheet(
+                    onDismiss = { currentSheet = SheetType.NONE },
+                    onAddReward = {
+
+                        coroutineScope.launch {
+                            rewardsViewModel.addReward(it)
+                            currentSheet = SheetType.NONE
+                        }
+                    },
+                    projects = projects,
+                )
+            }
+
+            SheetType.ADD_BUNDLE -> {}
+
+            SheetType.EDIT_REWARD -> {}
+
+            SheetType.NONE -> {}
+        }
+
         Column(modifier = Modifier.padding(paddingValues)) {
             HorizontalPager(
                 state = pagerState,
@@ -139,17 +185,41 @@ fun ReusableRewardsPage(
     rewards: List<RewardModel>,
     onRedeem: (RewardModel) -> Unit
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 160.dp),
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(rewards) { reward ->
-            ReusableRewardCard(
-                reward = reward,
-                onRedeem = { onRedeem(reward) }
+    if (rewards.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.no_rewards), // 🔁 Replace with your drawable
+                contentDescription = "No tasks",
+                modifier = Modifier.size(300.dp)
             )
+            Text(
+                text = "No rewards yet,\nadd your first one!",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 18.sp, // 👈 increase this as needed
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(rewards) { reward ->
+                ReusableRewardCard(
+                    reward = reward,
+                    onRedeem = { onRedeem(reward) }
+                )
+            }
         }
     }
 }
@@ -207,16 +277,40 @@ fun SingleUseRewardsPage(
     rewards: List<RewardModel>,
     onRedeem: (RewardModel) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(rewards) { reward ->
-            TicketRewardItem(
-                reward = reward,
-                onRedeem = { onRedeem(reward) }
+    if (rewards.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.no_rewards), // 🔁 Replace with your drawable
+                contentDescription = "No tasks",
+                modifier = Modifier.size(300.dp)
             )
+            Text(
+                text = "No rewards yet,\nadd your first one!",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 18.sp, // 👈 increase this as needed
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(rewards) { reward ->
+                TicketRewardItem(
+                    reward = reward,
+                    onRedeem = { onRedeem(reward) }
+                )
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.BookmarkAdded
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -125,37 +127,41 @@ fun AddTaskBottomSheet(
                 )
             }
 
-            Text("Choose a project", style = MaterialTheme.typography.labelMedium)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-            ) {
-                projects.forEach { project ->
-                    val isSelected = project == selectedProject
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            selectedProject = if (isSelected) null else project
-                        },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("${project.icon} ")
-                                Text(project.title)
-                            }
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            selectedBorderColor = MaterialTheme.colorScheme.primary
+            if(projects.isNotEmpty()) {
+                Text("Choose a project", style = MaterialTheme.typography.labelMedium)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                ) {
+                    projects.forEach { project ->
+                        val isSelected = project == selectedProject
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedProject = if (isSelected) null else project
+                            },
+                            label = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("${project.icon} ")
+                                    Text(project.title)
+                                }
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                labelColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                selectedBorderColor = MaterialTheme.colorScheme.primary
+                            )
+
+
                         )
-                    )
+                    }
                 }
             }
 
@@ -243,7 +249,7 @@ fun HeaderRow(
                 label = "iconToggle"
             ) { added ->
                 Icon(
-                    imageVector = if (added) Icons.Default.Check else Icons.Default.Add,
+                    imageVector = if (added) Icons.Default.BookmarkAdded else Icons.Default.BookmarkAdd,
                     contentDescription = if (added) "Added" else "Add"
                 )
             }

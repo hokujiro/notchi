@@ -114,7 +114,7 @@ fun Content(
     LazyRow(
         state = listState,
         modifier = Modifier .fillMaxWidth()
-            .height(200.dp),
+            .height(190.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
     ) {
         items(items = data.visibleDates) { day ->
@@ -152,7 +152,7 @@ fun ContentItem(
         Column(
             modifier = Modifier
                 .width(60.dp)
-                .height(100.dp)
+                .height(90.dp)
                 .padding(6.dp)
         ) {
             Text(
@@ -183,7 +183,7 @@ fun Header(
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically),
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.bodyLarge
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)
