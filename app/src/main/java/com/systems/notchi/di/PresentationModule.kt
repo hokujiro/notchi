@@ -17,6 +17,6 @@ val presentationModule = module {
     viewModel { AuthViewModel(get(), get(), get(), get(), get()) }
     viewModel { ProjectViewModel(get(), get(), get(), get(), get()) }
     viewModel { FrameViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { RewardsViewModel(get(), get()) }
+    viewModel { RewardsViewModel(get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
 }

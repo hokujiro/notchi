@@ -25,7 +25,9 @@ import com.systems.notchi.domain.usecase.profile.GetCurrentUserUseCase
 import com.systems.notchi.domain.usecase.profile.UpdateUserProfileUseCase
 import com.systems.notchi.domain.usecase.profile.UploadProfilePhotoUseCase
 import com.systems.notchi.domain.usecase.rewards.AddRewardUseCase
+import com.systems.notchi.domain.usecase.rewards.DeleteRewardUseCase
 import com.systems.notchi.domain.usecase.rewards.GetRewardsUseCase
+import com.systems.notchi.domain.usecase.rewards.RedeemRewardUseCase
 import com.systems.notchi.domain.usecase.tasks.AddTaskListUseCase
 import com.systems.notchi.domain.usecase.tasks.DeleteTaskListUseCase
 import com.systems.notchi.domain.usecase.tasks.GetTasksForRangeUseCase
@@ -61,5 +63,7 @@ val domainModule = module {
     factory { GetCurrentUserUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { UpdateUserProfileUseCase(get()) } // Assuming use case depends on TaskRepository
     factory { UploadProfilePhotoUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { RedeemRewardUseCase(get()) } // Assuming use case depends on TaskRepository
+    factory { DeleteRewardUseCase(get()) } // Assuming use case depends on TaskRepository
 
 }

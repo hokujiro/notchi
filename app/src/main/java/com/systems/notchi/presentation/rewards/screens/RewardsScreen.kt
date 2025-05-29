@@ -1,10 +1,16 @@
 package com.systems.notchi.presentation.rewards.screens
 
+import android.content.Context
+import android.graphics.Typeface
+import android.view.Gravity
+import android.widget.TextView
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +23,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -62,22 +69,30 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.systems.notchi.R
 import com.systems.notchi.presentation.theme.CharcoalText
 import com.systems.notchi.presentation.theme.CoolWhite
 import com.systems.notchi.presentation.theme.LightGray
 import com.systems.notchi.presentation.theme.MistBlueLight
+import com.systems.notchi.presentation.theme.MistGray
+import com.systems.notchi.presentation.theme.MistGrayDark
 import com.systems.notchi.presentation.theme.MistGrayLight
 import com.systems.notchi.presentation.theme.SubtleText
 
@@ -97,12 +112,13 @@ fun RewardsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val projects by projectViewModel.projects.collectAsState()
-    val totalPoints by taskViewModel.totalPoints.collectAsState()
+    val totalPoints by rewardsViewModel.totalPoints.collectAsState()
     val rewards by rewardsViewModel.rewards.collectAsState()
 
 
+
     LaunchedEffect(Unit) {
-        taskViewModel.loadUserPoints()
+        rewardsViewModel.getUserTotalPoints()
         projectViewModel.getAllProjects()
         rewardsViewModel.getAllRewards()
     }
@@ -202,14 +218,18 @@ fun RewardsScreen(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
+                val context = LocalContext.current
                 when (page) {
                     0 -> ReusableRewardsPage(
                         rewards = rewards.filter { it.reusable },
                         onRedeem = {
                             coroutineScope.launch {
                                 rewardsViewModel.redeemReward(it)
+                                context.showSuccessToast("Reward redeemed! ${it.points} points less!")
                             }
-                        }
+                        },
+                        userTotalPoints = totalPoints,
+                        rewardsViewModel
                     )
 
                     1 -> SingleUseRewardsPage(
@@ -217,8 +237,10 @@ fun RewardsScreen(
                         onRedeem = {
                             coroutineScope.launch {
                                 rewardsViewModel.redeemReward(it)
+                                context.showSuccessToast("Reward redeemed! ${it.points} points less!")
                             }
-                        }
+                        },
+                        userTotalPoints = totalPoints,
                     )
                 }
             }
@@ -226,12 +248,31 @@ fun RewardsScreen(
     }
 }
 
+fun Context.showSuccessToast(message: String) {
+    val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
+
+    // Create a custom background
+    val toastView = toast.view
+    toastView?.setBackgroundColor("#E9F5EC".toColorInt()) // Light green
+    val text = toastView?.findViewById<TextView>(android.R.id.message)
+    text?.setTextColor("#2E7D32".toColorInt()) // Darker green for text
+    text?.textSize = 14f
+    text?.typeface = Typeface.DEFAULT_BOLD
+    text?.gravity = Gravity.CENTER
+
+    toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 100)
+    toast.show()
+}
 
 @Composable
 fun ReusableRewardsPage(
     rewards: List<RewardModel>,
-    onRedeem: (RewardModel) -> Unit
+    onRedeem: (RewardModel) -> Unit,
+    userTotalPoints: Int,
+    rewardsViewModel: RewardsViewModel
 ) {
+    val deleteStates = remember { mutableStateMapOf<String, Boolean>() }
+    val coroutineScope = rememberCoroutineScope()
     if (rewards.isEmpty()) {
         Column(
             modifier = Modifier
@@ -263,9 +304,25 @@ fun ReusableRewardsPage(
             modifier = Modifier.fillMaxSize() // 👈 Ensures full width
         ) {
             items(rewards) { reward ->
+                val isEnabled = userTotalPoints >= (reward.points ?: 0)
+                val showDelete = deleteStates[reward.id] == true
+
                 ReusableRewardCard(
                     reward = reward,
-                    onRedeem = { onRedeem(reward) }
+                    isEnabled = isEnabled,
+                    showDelete = showDelete,
+                    onLongPress = {
+                        deleteStates[reward.id] = !(deleteStates[reward.id] ?: false)
+                    },
+                    onDelete = {
+                        deleteStates.remove(reward.id)
+                        coroutineScope.launch {
+                            rewardsViewModel.deleteReward(reward)
+                        }
+                    },
+                    onRedeem = {
+                        if (isEnabled) onRedeem(reward)
+                    }
                 )
             }
         }
@@ -273,48 +330,91 @@ fun ReusableRewardsPage(
 }
 
 @Composable
-fun ReusableRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
-    Card(
+@OptIn(ExperimentalFoundationApi::class)
+fun ReusableRewardCard(
+    reward: RewardModel,
+    isEnabled: Boolean,
+    showDelete: Boolean,
+    onLongPress: () -> Unit,
+    onDelete: () -> Unit,
+    onRedeem: () -> Unit
+) {
+    val cardColor = if (isEnabled) CoolWhite else MistGrayLight
+    val contentColor = if (isEnabled) CharcoalText else MistGrayDark
+    val borderColor = if (isEnabled) MistGrayLight else MistGray
+
+    Box(
         modifier = Modifier
             .width(140.dp)
             .height(160.dp)
-            .padding(6.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = CoolWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(1.dp, MistGrayLight)
+            .padding(6.dp)
+            .combinedClickable(
+                onClick = {}, // Optional regular click
+                onLongClick = onLongPress
+            )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = cardColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            border = BorderStroke(1.dp, borderColor),
+            modifier = Modifier.fillMaxSize()
         ) {
-            reward.icon?.let {
-                Text(it, style = MaterialTheme.typography.titleMedium)
-            }
-
-            Column {
-                Text(
-                    reward.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = CharcoalText,
-                    maxLines = 2
-                )
-                Text(
-                    "⭐ ${reward.points} pts",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = SubtleText
-                )
-            }
-
-            Button(
-                onClick = onRedeem,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Canjear", style = MaterialTheme.typography.labelMedium)
+                reward.icon?.let {
+                    Text(it, style = MaterialTheme.typography.titleMedium, color = contentColor)
+                }
+
+                Column {
+                    Text(
+                        reward.title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = contentColor,
+                        maxLines = 2
+                    )
+                    Text(
+                        "⭐ ${reward.points} pts",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = SubtleText
+                    )
+                }
+
+                Button(
+                    onClick = onRedeem,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = isEnabled,
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isEnabled) MistBlueLight else MistGray,
+                        contentColor = if (isEnabled) Color.Black else Color.DarkGray
+                    )
+                ) {
+                    Text("Canjear", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+
+        // Show delete button if toggled
+        if (showDelete) {
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-8).dp, y = 8.dp)
+                    .background(Color.Red, CircleShape)
+                    .size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = "Delete",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }
@@ -323,7 +423,8 @@ fun ReusableRewardCard(reward: RewardModel, onRedeem: () -> Unit) {
 @Composable
 fun SingleUseRewardsPage(
     rewards: List<RewardModel>,
-    onRedeem: (RewardModel) -> Unit
+    onRedeem: (RewardModel) -> Unit,
+    userTotalPoints: Int,
 ) {
     if (rewards.isEmpty()) {
         Column(

@@ -28,12 +28,16 @@ class RewardRepositoryImpl(
         rewardApi.addReward(mapper.toRewardEntity(reward))
     }
 
+    override suspend fun redeemReward(rewardId: String) {
+        rewardApi.redeemReward(rewardId)
+    }
+
     override suspend fun getRewardsForDay(date: Long): List<RewardModel> {
         TODO("Not yet implemented")
     }
 
     override suspend fun deleteReward(id: String) {
-        TODO("Not yet implemented")
+        rewardApi.deleteReward(id)
     }
 
     override suspend fun updateReward(reward: RewardModel) {
