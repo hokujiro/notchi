@@ -71,8 +71,7 @@ val dataModule = module {
     single(named("unauthenticatedRetrofit")) {
         Retrofit.Builder()
             //.baseUrl("http://10.0.2.2:8080/")
-             .baseUrl("https://server-1son.onrender.c" +
-                     "om/")
+             .baseUrl("https://server-1son.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get(named("unauthenticated")))
             .build()
@@ -80,9 +79,8 @@ val dataModule = module {
 
     single(named("authenticatedRetrofit")) {
         Retrofit.Builder()
-           // .baseUrl("http://10.0.2.2:8080/")
+           //.baseUrl("http://10.0.2.2:8080/")
             .baseUrl("https://server-1son.onrender.com/")
-
             .addConverterFactory(GsonConverterFactory.create())
             .client(get(named("authenticated")))
             .build()

@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.systems.notchi.R
+import com.systems.notchi.presentation.tasks.TasksActivity
 
 
 class AuthActivity : AppCompatActivity() {
@@ -251,7 +252,7 @@ fun AuthScreen(viewModel: AuthViewModel = koinViewModel()) {
         // ✅ Navigate on successful login
         LaunchedEffect(shouldNavigate) {
             if (shouldNavigate) {
-                val intent = Intent(context, RewardsActivity::class.java)
+                val intent = Intent(context, TasksActivity::class.java)
                 context.startActivity(intent)
                 if (context is Activity) context.finish()
             }

@@ -4,7 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -65,6 +67,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -113,20 +118,20 @@ fun RewardsScreen(
         bottomBar = {
             BottomNavigationBar(selectedRoute = "rewards")
         },
-                floatingActionButton = {
-                    ExpandableFab(
-                        onActionClick = { index ->
-                            isFabExpanded = false
-                            currentSheet = when (index) {
-                                0 -> SheetType.ADD_REWARD
-                                1 -> SheetType.ADD_BUNDLE
-                                else -> SheetType.NONE
-                            }
-                        },
-                        onToggle = { isFabExpanded = !isFabExpanded },
-                        isExpanded = isFabExpanded,
-                    )
-                }
+        floatingActionButton = {
+            ExpandableFab(
+                onActionClick = { index ->
+                    isFabExpanded = false
+                    currentSheet = when (index) {
+                        0 -> SheetType.ADD_REWARD
+                        1 -> SheetType.ADD_BUNDLE
+                        else -> SheetType.NONE
+                    }
+                },
+                onToggle = { isFabExpanded = !isFabExpanded },
+                isExpanded = isFabExpanded,
+            )
+        }
     ) { paddingValues ->
 
         when (currentSheet) {
@@ -152,6 +157,47 @@ fun RewardsScreen(
         }
 
         Column(modifier = Modifier.padding(paddingValues)) {
+
+            Spacer(modifier = Modifier.height(12.dp)) // space below top bar
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                listOf("Reusables", "One-time").forEachIndexed { index, title ->
+                    val selected = pagerState.currentPage == index
+
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(
+                                if (selected) MaterialTheme.colorScheme.surfaceVariant
+                                else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                            )
+                            .clickable {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            }
+                            .padding(horizontal = 20.dp, vertical = 8.dp) // pill shape
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (selected)
+                                MaterialTheme.colorScheme.onSurface
+                            else
+                                MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
@@ -165,6 +211,7 @@ fun RewardsScreen(
                             }
                         }
                     )
+
                     1 -> SingleUseRewardsPage(
                         rewards = rewards.filter { !it.reusable },
                         onRedeem = {
@@ -209,10 +256,11 @@ fun ReusableRewardsPage(
         }
     } else {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 160.dp),
+            columns = GridCells.Fixed(2), // 👈 Forces two columns, no centering
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize() // 👈 Ensures full width
         ) {
             items(rewards) { reward ->
                 ReusableRewardCard(

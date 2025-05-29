@@ -15,7 +15,7 @@ import com.systems.notchi.domain.usecase.auth.GoogleAuthUseCase
 import com.systems.notchi.domain.usecase.auth.LoginUseCase
 import com.systems.notchi.domain.usecase.auth.RefreshTokenUseCase
 import com.systems.notchi.domain.usecase.auth.RegisterUseCase
-import com.systems.notchi.presentation.rewards.RewardsActivity
+import com.systems.notchi.presentation.tasks.TasksActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,7 +82,7 @@ class AuthViewModel(
                     tokenManager.saveTokens(it.token, it.refreshToken)
 
                     _navigateToHome.value = true
-                    val intent = Intent(context, RewardsActivity::class.java)
+                    val intent = Intent(context, TasksActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     context.startActivity(intent)
 

@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,14 +57,13 @@ fun CreateProjectScreen(
     onSave: (ProjectUiModel) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
-    var icon by remember { mutableStateOf("📁") }
     var tasks by remember { mutableStateOf(listOf<TaskModel>()) }
-    var selectedIcon by remember { mutableStateOf("✅") } // Default emoji
-    val coroutineScope = rememberCoroutineScope()
+    var selectedIcon by remember { mutableStateOf("✅") }
     var showEmojiPicker by remember { mutableStateOf(false) }
-    val sharedShape = RoundedCornerShape(20.dp)
-    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
 
+    val sharedShape = RoundedCornerShape(20.dp)
+    val coroutineScope = rememberCoroutineScope()
+    val colorScheme = MaterialTheme.colorScheme
 
     Scaffold(
         topBar = {
@@ -75,93 +76,80 @@ fun CreateProjectScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        val newProject =
-                            ProjectUiModel(
-                                title = title,
-                                color = "0xFF3B5F6B",
-                                tasksList = tasks,
-                                icon = selectedIcon
-                            )
+                        val newProject = ProjectUiModel(
+                            title = title,
+                            color = "0xFF3B5F6B",
+                            tasksList = tasks,
+                            icon = selectedIcon
+                        )
                         onSave(newProject)
                     }) {
-                        Text("Save")
+                        Text("Save", color = colorScheme.primary)
                     }
                 }
             )
-        }
+        },
+        containerColor = colorScheme.background
     ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Emoji Button styled like a field
                 Surface(
-                    shape = sharedShape,
-                    color = backgroundColor,
-                    modifier = Modifier.size(56.dp)
+                    shape = CircleShape,
+                    color = colorScheme.surfaceVariant,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clickable { showEmojiPicker = true }
                 ) {
                     Box(
-                        modifier = Modifier
-                            .clickable {
-                                coroutineScope.launch { showEmojiPicker = true }
-                            }
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Text(text = selectedIcon, fontSize = 24.sp)
                     }
                 }
 
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = { Text("Project Title") },
-                        shape = sharedShape,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = backgroundColor,
-                        ),
-                        modifier = Modifier.weight(1f)
-                    )
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Project Title") },
+                    shape = sharedShape,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             if (showEmojiPicker) {
-                Dialog(onDismissRequest = {
-                    showEmojiPicker = false
-                }) {
+                Dialog(onDismissRequest = { showEmojiPicker = false }) {
                     Surface(
-                        shape = RoundedCornerShape(32.dp),
+                        shape = RoundedCornerShape(24.dp),
                         tonalElevation = 10.dp,
                         modifier = Modifier
-                            .fillMaxWidth() // 👉 wider (95% of screen width)
+                            .fillMaxWidth()
                             .heightIn(max = 500.dp)
-                            .padding(horizontal = 4.dp, vertical = 16.dp)
+                            .padding(8.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                        ) {
-                            EmojiPicker(
-                                onDismiss = { showEmojiPicker = false },
-                                onConfirm = { emoji ->
-                                    selectedIcon = emoji
-                                    showEmojiPicker = false
-                                }
-                            )
-                        }
+                        EmojiPicker(
+                            onDismiss = { showEmojiPicker = false },
+                            onConfirm = { emoji ->
+                                selectedIcon = emoji
+                                showEmojiPicker = false
+                            }
+                        )
                     }
                 }
             }
-
-
-            //IconPicker(selectedIcon = icon, onIconSelected = { icon = it })
 
             Text("Tasks", style = MaterialTheme.typography.titleMedium)
 
@@ -187,7 +175,8 @@ fun CreateProjectScreen(
                         project = TaskProjectModel()
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
             ) {
                 Text("Add Task")
             }
@@ -201,15 +190,27 @@ fun TaskInputItem(
     onTaskChange: (TaskModel) -> Unit,
     onRemove: () -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(
-            value = task.title,
-            onValueChange = { onTaskChange(task.copy(title = it)) },
-            label = { Text("Task") },
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = onRemove) {
-            Icon(Icons.Default.Delete, contentDescription = "Remove Task")
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        tonalElevation = 2.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            OutlinedTextField(
+                value = task.title,
+                onValueChange = { onTaskChange(task.copy(title = it)) },
+                label = { Text("Task") },
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onRemove) {
+                Icon(Icons.Default.Delete, contentDescription = "Remove Task")
+            }
         }
     }
 }
@@ -221,24 +222,40 @@ fun EmojiPicker(
 ) {
     BackHandler { onDismiss() }
 
-    AndroidView(
-        factory = { context ->
-            androidx.emoji2.emojipicker.EmojiPickerView(context).apply {
-                clipToOutline = true
-                isVerticalScrollBarEnabled = true
-                setRecentEmojiProvider(
-                    RecentEmojiProviderAdapter(CustomRecentEmojiProvider(context))
-                )
-                setOnEmojiPickedListener { emoji ->
-                    onDismiss()
-                    onConfirm(emoji.emoji)
-                }
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 500.dp) // 👈 This is the key
-    )
-}
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            tonalElevation = 12.dp,
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier
+                .fillMaxWidth() // ⬅️ Full width
+                .heightIn(min = 500.dp, max = 700.dp)
+                .padding(horizontal = 0.dp, vertical = 12.dp) // ⬅️ Minimal outer padding
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp) // ⬅️ Inner breathing space
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        androidx.emoji2.emojipicker.EmojiPickerView(context).apply {
+                            setRecentEmojiProvider(
+                                RecentEmojiProviderAdapter(CustomRecentEmojiProvider(context))
+                            )
+                            emojiGridRows = 6.5f // More height
+                            emojiGridColumns = 7 // Fewer columns = larger emojis
 
+                            setOnEmojiPickedListener { emoji ->
+                                onDismiss()
+                                onConfirm(emoji.emoji)
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
 
