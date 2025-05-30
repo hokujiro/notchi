@@ -19,7 +19,7 @@ interface RewardApi {
      @POST("api/rewards/redeem/{id}")
      suspend fun redeemReward(@Path("id") id: String): Response<Unit>
 
-     @POST("api/rewards/delete/{id}")
+     @DELETE("api/rewards/delete/{id}")
      suspend fun deleteReward(@Path("id") id: String): Response<Unit>
 
 }

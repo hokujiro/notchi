@@ -72,9 +72,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Redeem
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ScrollableTabRow
@@ -87,6 +91,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.systems.notchi.R
+import com.systems.notchi.presentation.rewards.components.ReusableRewardsPage
+import com.systems.notchi.presentation.rewards.components.SingleUseRewardsPage
 import com.systems.notchi.presentation.theme.CharcoalText
 import com.systems.notchi.presentation.theme.CoolWhite
 import com.systems.notchi.presentation.theme.LightGray
@@ -241,6 +247,7 @@ fun RewardsScreen(
                             }
                         },
                         userTotalPoints = totalPoints,
+                        rewardsViewModel
                     )
                 }
             }
@@ -264,256 +271,8 @@ fun Context.showSuccessToast(message: String) {
     toast.show()
 }
 
-@Composable
-fun ReusableRewardsPage(
-    rewards: List<RewardModel>,
-    onRedeem: (RewardModel) -> Unit,
-    userTotalPoints: Int,
-    rewardsViewModel: RewardsViewModel
-) {
-    val deleteStates = remember { mutableStateMapOf<String, Boolean>() }
-    val coroutineScope = rememberCoroutineScope()
-    if (rewards.isEmpty()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(WindowInsets.systemBars.asPaddingValues()),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.no_rewards), // 🔁 Replace with your drawable
-                contentDescription = "No tasks",
-                modifier = Modifier.size(300.dp)
-            )
-            Text(
-                text = "No rewards yet,\nadd your first one!",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 18.sp, // 👈 increase this as needed
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        }
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // 👈 Forces two columns, no centering
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize() // 👈 Ensures full width
-        ) {
-            items(rewards) { reward ->
-                val isEnabled = userTotalPoints >= (reward.points ?: 0)
-                val showDelete = deleteStates[reward.id] == true
 
-                ReusableRewardCard(
-                    reward = reward,
-                    isEnabled = isEnabled,
-                    showDelete = showDelete,
-                    onLongPress = {
-                        deleteStates[reward.id] = !(deleteStates[reward.id] ?: false)
-                    },
-                    onDelete = {
-                        deleteStates.remove(reward.id)
-                        coroutineScope.launch {
-                            rewardsViewModel.deleteReward(reward)
-                        }
-                    },
-                    onRedeem = {
-                        if (isEnabled) onRedeem(reward)
-                    }
-                )
-            }
-        }
-    }
-}
 
-@Composable
-@OptIn(ExperimentalFoundationApi::class)
-fun ReusableRewardCard(
-    reward: RewardModel,
-    isEnabled: Boolean,
-    showDelete: Boolean,
-    onLongPress: () -> Unit,
-    onDelete: () -> Unit,
-    onRedeem: () -> Unit
-) {
-    val cardColor = if (isEnabled) CoolWhite else MistGrayLight
-    val contentColor = if (isEnabled) CharcoalText else MistGrayDark
-    val borderColor = if (isEnabled) MistGrayLight else MistGray
-
-    Box(
-        modifier = Modifier
-            .width(140.dp)
-            .height(160.dp)
-            .padding(6.dp)
-            .combinedClickable(
-                onClick = {}, // Optional regular click
-                onLongClick = onLongPress
-            )
-    ) {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            border = BorderStroke(1.dp, borderColor),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                reward.icon?.let {
-                    Text(it, style = MaterialTheme.typography.titleMedium, color = contentColor)
-                }
-
-                Column {
-                    Text(
-                        reward.title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = contentColor,
-                        maxLines = 2
-                    )
-                    Text(
-                        "⭐ ${reward.points} pts",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = SubtleText
-                    )
-                }
-
-                Button(
-                    onClick = onRedeem,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = isEnabled,
-                    contentPadding = PaddingValues(0.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isEnabled) MistBlueLight else MistGray,
-                        contentColor = if (isEnabled) Color.Black else Color.DarkGray
-                    )
-                ) {
-                    Text("Canjear", style = MaterialTheme.typography.labelMedium)
-                }
-            }
-        }
-
-        // Show delete button if toggled
-        if (showDelete) {
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-8).dp, y = 8.dp)
-                    .background(Color.Red, CircleShape)
-                    .size(24.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Remove,
-                    contentDescription = "Delete",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun SingleUseRewardsPage(
-    rewards: List<RewardModel>,
-    onRedeem: (RewardModel) -> Unit,
-    userTotalPoints: Int,
-) {
-    if (rewards.isEmpty()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(WindowInsets.systemBars.asPaddingValues()),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.no_rewards), // 🔁 Replace with your drawable
-                contentDescription = "No tasks",
-                modifier = Modifier.size(300.dp)
-            )
-            Text(
-                text = "No rewards yet,\nadd your first one!",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 18.sp, // 👈 increase this as needed
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(rewards) { reward ->
-                TicketRewardItem(
-                    reward = reward,
-                    onRedeem = { onRedeem(reward) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun TicketRewardItem(
-    reward: RewardModel,
-    onRedeem: () -> Unit
-) {
-    val isRedeemed = reward.redeemed
-    val shape = if (isRedeemed) {
-        // Simulate "torn" ticket by altering shape
-        CutCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
-    } else {
-        RoundedCornerShape(12.dp)
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = CoolWhite),
-        border = BorderStroke(1.dp, MistGrayLight)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            reward.icon?.let {
-                Text(it, style = MaterialTheme.typography.titleMedium)
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(reward.title, style = MaterialTheme.typography.bodyMedium)
-                Text("⭐ ${reward.points} pts", style = MaterialTheme.typography.labelSmall)
-            }
-
-            if (!isRedeemed) {
-                Button(
-                    onClick = onRedeem,
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MistBlueLight)
-                ) {
-                    Text("Canjear", style = MaterialTheme.typography.labelMedium)
-                }
-            } else {
-                Icon(Icons.Default.Done, contentDescription = "Redeemed", tint = Color.Gray)
-            }
-        }
-    }
-}
 
 
 enum class SheetType { ADD_REWARD, ADD_BUNDLE, EDIT_REWARD, NONE }

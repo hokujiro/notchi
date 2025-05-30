@@ -35,7 +35,7 @@ fun ExpandableFab(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(16.dp)
         ) {
-            if (isExpanded) {
+            /*if (isExpanded) {
                 FloatingActionButton(
                     onClick = { onActionClick(0) },
                     shape = CircleShape,
@@ -53,15 +53,15 @@ fun ExpandableFab(
                 ) {
                     Icon(Icons.Default.GridOn, contentDescription = "Create Reward List")
                 }
-            }
+            }*/
 
             FloatingActionButton(
-                onClick = onToggle,
+                onClick = {  onActionClick(0)  },
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.Add,
+                    imageVector = /*if (isExpanded) Icons.Default.Close else */Icons.Default.Add,
                     contentDescription = "Toggle Menu"
                 )
             }

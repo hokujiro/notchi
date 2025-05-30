@@ -56,9 +56,8 @@ class RewardsViewModel(
     }
 
     suspend fun deleteReward(reward: RewardModel) {
-        redeemRewardUseCase.execute(reward)
+        deleteRewardUseCase.execute(reward)
         _rewards.value -= reward
-        getAllRewards()
     }
 
     suspend fun addReward(reward: RewardModel) {
